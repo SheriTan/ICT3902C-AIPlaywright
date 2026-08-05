@@ -3,13 +3,28 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:demo": "cross-env ENV=DEMO playwright test",
+    "test:dev": "cross-env ENV=DEV playwright test",
+    "test:uat": "cross-env ENV=UAT playwright test",
+    "test:prod": "cross-env ENV=PROD playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "report": "playwright show-report reports/html-report",
+    "report:allure": "npx allure-commandline generate reports/allure-results --clean -o reports/allure-report && npx allure-commandline open reports/allure-report"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@types/node": "^25.5.0"
+    "@types/node": "^25.5.0",
+    "allure-commandline": "^2.43.0",
+    "allure-playwright": "^3.10.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2"
   }
 }

@@ -1,0 +1,266 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\playwright.config.js",
+    "rootDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 3
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/Users/sitwl/OneDrive/Documents/GitHub/ICT3902C-AIPlaywright/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\reports/html-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\reports/results.json"
+        }
+      ],
+      [
+        "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\node_modules\\allure-playwright\\dist\\cjs\\index.js",
+        {
+          "resultsDir": "reports/allure-results"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 8,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "example.spec.js",
+      "file": "example.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TodoMVC - add and complete an item",
+          "file": "example.spec.js",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "adds a todo item and marks it complete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3170,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" resolved via strategy \"placeholder\"\n"
+                        },
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoListItem\" resolved via strategy \"text\"\n"
+                        },
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoCompleteCheckbox\" resolved via strategy \"css\"\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-05T21:22:47.964Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd9b2edffe9b7501040c-2e17c75c1130ffe698f5",
+              "file": "example.spec.js",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "adds a todo item and marks it complete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6871,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" resolved via strategy \"placeholder\"\n"
+                        },
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoListItem\" resolved via strategy \"text\"\n"
+                        },
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoCompleteCheckbox\" resolved via strategy \"css\"\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-05T21:22:47.932Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd9b2edffe9b7501040c-8e0c632b2bd000055427",
+              "file": "example.spec.js",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "adds a todo item and marks it complete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 6314,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" resolved via strategy \"placeholder\"\n"
+                        },
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoListItem\" resolved via strategy \"text\"\n"
+                        },
+                        {
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoCompleteCheckbox\" resolved via strategy \"css\"\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-05T21:22:48.007Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd9b2edffe9b7501040c-f8b23801336246117061",
+              "file": "example.spec.js",
+              "line": 5,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-05T21:22:45.836Z",
+    "duration": 16228.855999999998,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

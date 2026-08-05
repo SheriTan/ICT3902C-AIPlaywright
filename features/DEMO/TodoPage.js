@@ -1,4 +1,7 @@
 const { BasePage } = require('../BasePage');
+const { loadLocatorSpec } = require('../../utils/locatorLoader')
+
+const PAGE_NAME = 'todoPage';
 
 class TodoPage {
   constructor(page, executor) {
@@ -16,13 +19,7 @@ class TodoPage {
   /** @param {string} itemText */
   async addItem(itemText) {
     return this.base.step(`Add a new todo item ("${itemText}")`, async () => {
-      const newTodoInput = await this.base.locate({
-        name: 'newTodoInput',
-        strategies: [
-          { type: 'placeholder', value: 'What needs to be done?' },
-          { type: 'role', value: { role: 'textbox' } },
-        ],
-      });
+      const newTodoInput = await this.base.locate(loadLocatorSpec(PAGE_NAME, 'newTodoInput'));
       await newTodoInput.fill(itemText);
       await newTodoInput.press('Enter');
     });
@@ -32,26 +29,15 @@ class TodoPage {
   async verifyItemVisible(itemText) {
     return this.base.step(`Verify "${itemText}" appears in the list`, async () => {
       await this.base.wait().waitForStableDOM({ timeout: 5000 });
-      const todoItem = await this.base.locate({
-        name: 'todoListItem',
-        strategies: [
-          { type: 'text', value: itemText },
-          { type: 'css', value: '.todo-list li' },
-        ],
-      });
+      const spec = loadLocatorSpec(PAGE_NAME, 'todoListItem', { dynamicValue: itemText });
+      const todoItem = await this.base.locate(spec);
       return todoItem;
     });
   }
 
   async markFirstItemComplete() {
     return this.base.step('Mark the item complete', async () => {
-      const completeCheckbox = await this.base.locate({
-        name: 'todoCompleteCheckbox',
-        strategies: [
-          { type: 'css', value: '.todo-list li .toggle' },
-          { type: 'role', value: { role: 'checkbox' } },
-        ],
-      });
+      const completeCheckbox = await this.base.locate(loadLocatorSpec(PAGE_NAME, 'todoCompleteCheckbox'));
       await completeCheckbox.check();
     });
   }

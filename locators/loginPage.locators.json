@@ -1,0 +1,20 @@
+{
+  "usernameInput": {
+    "strategies": [
+      { "type": "testId", "value": "username" },
+      { "type": "label", "value": "Username" }
+    ]
+  },
+  "passwordInput": {
+    "strategies": [
+      { "type": "testId", "value": "password" },
+      { "type": "label", "value": "Password" }
+    ]
+  },
+  "loginSubmitButton": {
+    "strategies": [
+      { "type": "role", "value": { "role": "button", "name": "Log in" } },
+      { "type": "testId", "value": "login-submit" }
+    ]
+  }
+}

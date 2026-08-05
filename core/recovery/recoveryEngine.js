@@ -35,11 +35,13 @@ class RecoveryEngine {
     async _runRecoveryActions() {
         try {
             await this.page.keyboard.press('Escape'); // dismiss stray overlays/tooltips
-        } catch (_) { /* page may not accept keyboard input right now - ignore */ }
+        } catch (_) { // To Be Added
+        }
 
         try {
             await this.waitEngine.waitForStableDOM({ timeout: 5000, quietPeriod: 300 });
-        } catch (_) { /* if the DOM never stabilizes, let the next attempt surface the real error */ }
+        } catch (_) { // To Be Added
+        }
     }
 }
 

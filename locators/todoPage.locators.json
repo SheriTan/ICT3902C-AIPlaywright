@@ -1,0 +1,20 @@
+{
+  "newTodoInput": {
+    "strategies": [
+      { "type": "placeholder", "value": "What needs to be done?" },
+      { "type": "role", "value": { "role": "textbox" } }
+    ]
+  },
+  "todoListItem": {
+    "strategies": [
+      { "type": "text", "value": "__DYNAMIC__" },
+      { "type": "css", "value": ".todo-list li" }
+    ]
+  },
+  "todoCompleteCheckbox": {
+    "strategies": [
+      { "type": "css", "value": ".todo-list li .toggle" },
+      { "type": "role", "value": { "role": "checkbox" } }
+    ]
+  }
+}
