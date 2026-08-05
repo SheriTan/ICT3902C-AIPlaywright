@@ -1,0 +1,64 @@
+const { BasePage } = require('../BasePage');
+
+class TodoPage {
+  constructor(page, executor) {
+    this.base = new BasePage(page, executor);
+    this.page = page;
+  }
+
+  async goto() {
+    return this.base.step('Navigate to the TodoMVC app', async () => {
+      await this.page.goto('');
+      await this.base.wait().waitForNetworkIdle();
+    });
+  }
+
+  /** @param {string} itemText */
+  async addItem(itemText) {
+    return this.base.step(`Add a new todo item ("${itemText}")`, async () => {
+      const newTodoInput = await this.base.locate({
+        name: 'newTodoInput',
+        strategies: [
+          { type: 'placeholder', value: 'What needs to be done?' },
+          { type: 'role', value: { role: 'textbox' } },
+        ],
+      });
+      await newTodoInput.fill(itemText);
+      await newTodoInput.press('Enter');
+    });
+  }
+
+  /** @param {string} itemText */
+  async verifyItemVisible(itemText) {
+    return this.base.step(`Verify "${itemText}" appears in the list`, async () => {
+      await this.base.wait().waitForStableDOM({ timeout: 5000 });
+      const todoItem = await this.base.locate({
+        name: 'todoListItem',
+        strategies: [
+          { type: 'text', value: itemText },
+          { type: 'css', value: '.todo-list li' },
+        ],
+      });
+      return todoItem;
+    });
+  }
+
+  async markFirstItemComplete() {
+    return this.base.step('Mark the item complete', async () => {
+      const completeCheckbox = await this.base.locate({
+        name: 'todoCompleteCheckbox',
+        strategies: [
+          { type: 'css', value: '.todo-list li .toggle' },
+          { type: 'role', value: { role: 'checkbox' } },
+        ],
+      });
+      await completeCheckbox.check();
+    });
+  }
+
+  completedItemsLocator() {
+    return this.page.locator('.todo-list li.completed');
+  }
+}
+
+module.exports = { TodoPage };

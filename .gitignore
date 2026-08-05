@@ -7,3 +7,5 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .github
+.env
+/data/sensitive (do not commit)/*

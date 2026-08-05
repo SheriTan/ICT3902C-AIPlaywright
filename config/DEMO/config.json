@@ -1,0 +1,7 @@
+{
+  "env": "DEMO",
+  "baseURL": "https://demo.playwright.dev/todomvc",
+  "timeout": 30000,
+  "retries": 1,
+  "credentialsFile": "../../data/sensitive/DEMO/creds.json"
+}
