@@ -1,6 +1,5 @@
 const base = require('@playwright/test');
 const { TestExecutor } = require('../core/executor/testExecutor');
-const { Logger } = require('../core/logger/logger');
 
 const test = base.test.extend({
     executor: async ({ page }, use, testInfo) => {
@@ -9,6 +8,7 @@ const test = base.test.extend({
         await use(executor);
 
         const executionStatus = testInfo.status === 'passed' ? 'pass' : 'fail';
+        const attemptNumber = testInfo.retry + 1; // 1-based: "first run", "second run", ...
 
         let error = null;
         if (executionStatus === 'fail' && testInfo.error) {
@@ -16,13 +16,25 @@ const test = base.test.extend({
             error.stack = testInfo.error.stack;
         }
 
-        const logger = new Logger(testInfo);
-        await logger.logResult({
-            executionStatus,
+        const logger = executor.logger;
+        const locatorUsed = executor.getLastLocatorUsed();
+
+        const runLogPath = await logger.writeRunLog({
+            status: executionStatus,
             error,
-            locatorUsed: executor.getLastLocatorUsed(),
+            locatorUsed,
             page,
+            attemptNumber,
         });
+
+        if (executionStatus === 'pass' || executor.isFinalAttempt) {
+            await logger.writeTestResult({
+                status: executionStatus,
+                error,
+                locatorUsed,
+                runLogPath,
+            });
+        }
     },
 });
 

@@ -8,12 +8,10 @@ class BasePage {
     this.executor = executor;
   }
 
-  /** Shorthand so page object methods don't re-import LocatorEngine. */
   async locate(spec, options) {
     return this.executor.locate(spec, options);
   }
 
-  /** Shorthand so page object methods can still wrap actions as reported steps. */
   async step(name, fn) {
     return this.executor.step(name, fn);
   }

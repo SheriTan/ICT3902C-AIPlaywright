@@ -1,3 +1,0 @@
-[INFO] [adds a todo item and marks it complete] Locator "newTodoInput" resolved via strategy "placeholder"
-[INFO] [adds a todo item and marks it complete] Locator "todoListItem" resolved via strategy "text"
-[INFO] [adds a todo item and marks it complete] Locator "todoCompleteCheckbox" resolved via strategy "css"

@@ -11,7 +11,7 @@ class TodoPage {
 
   async goto() {
     return this.base.step('Navigate to the TodoMVC app', async () => {
-      await this.page.goto('');
+      await this.page.goto('/');
       await this.base.wait().waitForNetworkIdle();
     });
   }

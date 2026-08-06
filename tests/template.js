@@ -1,6 +1,5 @@
 // COPY THIS FILE to start a new test. Rename it to e.g. "login.spec.js".
-// OBSOLETE COMMAND: Run with: npx playwright test tests/[filename] --project=[browser type]
-// Run with: npx playwright test
+// Run with: npm run test:[env/browser]
 const { test, expect } = require('../utils/templateHandler');
 
 // == Sample Import Feature ==

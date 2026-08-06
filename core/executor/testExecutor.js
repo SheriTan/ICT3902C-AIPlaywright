@@ -8,9 +8,10 @@ class TestExecutor {
         this.page = page;
         this.testInfo = testInfo;
         this.logger = new Logger(testInfo);
-        this.locatorEngine = new LocatorEngine(testInfo);
+        this.locatorEngine = new LocatorEngine(this.logger);
         this.waitEngine = new WaitEngine(page);
-        this.recoveryEngine = new RecoveryEngine(page);
+        this.recoveryEngine = new RecoveryEngine(page, this.logger);
+        this.lastFailedStep = null;
     }
 
     async locate(spec, options) {
@@ -25,6 +26,15 @@ class TestExecutor {
         return this.locatorEngine.lastUsed;
     }
 
+    getLastFailedStep() {
+        return this.lastFailedStep;
+    }
+
+    get isFinalAttempt() {
+        const configuredRetries = this.testInfo?.project?.retries ?? 0;
+        return this.testInfo.retry === configuredRetries;
+    }
+
     /**
      * Test step wrapper end-to-end:
      *  1. runs it + automatic retry + recovery actions on failure
@@ -34,7 +44,8 @@ class TestExecutor {
      * @param {{retries?: number}} options
      */
     async step(name, fn, options = {}) {
-        const { retries = 1 } = options;
+        const defaultRetries = this.isFinalAttempt ? 0 : 2;
+        const { retries = defaultRetries } = options;
 
         return this.testInfo.step
             ? this.testInfo.step(name, () => this._runStep(name, fn, retries))
@@ -45,8 +56,7 @@ class TestExecutor {
         try {
             return await this.recoveryEngine.retry(fn, { retries, label: name });
         } catch (error) {
-            const logPath = await this.logger.logError(error, this.page, name);
-
+            this.lastFailedStep = name;
             throw error;
         }
     }

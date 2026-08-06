@@ -1,5 +1,3 @@
-// To load locators in pattern files
-
 const fs = require('fs');
 const path = require('path');
 

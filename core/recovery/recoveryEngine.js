@@ -3,8 +3,9 @@
 const { WaitEngine } = require('../wait-engine/waitEngine');
 
 class RecoveryEngine {
-    constructor(page) {
+    constructor(page, logger = null) {
         this.page = page;
+        this.logger = logger;
         this.waitEngine = new WaitEngine(page);
     }
 
@@ -23,7 +24,9 @@ class RecoveryEngine {
             } catch (err) {
                 lastError = err;
                 if (attempt < retries) {
-                    console.warn(`[RECOVERY] "${label}" failed (attempt ${attempt + 1}/${retries + 1}): ${err.message.split('\n')[0]}`);
+                    const message = `"${label}" failed (attempt ${attempt + 1}/${retries + 1}): ${err.message.split('\n')[0]} - retrying`;
+                    if (this.logger) this.logger.info(message);
+                    else console.warn(`[RECOVERY] ${message}`);
                     await this._runRecoveryActions();
                 }
             }
@@ -34,7 +37,7 @@ class RecoveryEngine {
 
     async _runRecoveryActions() {
         try {
-            await this.page.keyboard.press('Escape'); // dismiss stray overlays/tooltips
+            await this.page.keyboard.press('Escape'); // dismiss overlays/tooltips
         } catch (_) { // To Be Added
         }
 

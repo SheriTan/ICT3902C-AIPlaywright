@@ -2,10 +2,12 @@
 # Playwright
 node_modules/
 /test-results/
-/playwright-report/
+/reports/
+/logs/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
 .github
 .env
 /data/sensitive (do not commit)/*

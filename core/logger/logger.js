@@ -1,27 +1,25 @@
-// Build JSON log whenever encounter failure:
-// - errorType      : name of error
-// - errorMessage   : human-readable message
-// - domSnapshot    : the page's HTML at the moment of failure
-// - screenshotPath : saved image of what the browser looked like
-// - context        : which test, which step, which browser, timestamp
 
 const fs = require('fs');
 const path = require('path');
 
 const LOGS_DIR = path.join(__dirname, '..', '..', 'logs');
 const SENSITIVE_KEYS = ['password', 'pass', 'token', 'secret', 'apiKey', 'api_key', 'authorization'];
+const DOM_EXCERPT_LIMIT = 2000;
 
 class Logger {
     constructor(testInfo) {
         this.testInfo = testInfo;
+        this._trace = [];
     }
 
     info(message) {
+        const entry = { timestamp: new Date().toISOString(), message };
+        this._trace.push(entry);
         console.log(`[INFO] [${this.testInfo?.title || 'unknown test'}] ${message}`);
     }
 
     // Masking
-    static mask(value, visibleChars = 1) {
+    static mask(value, visibleChars = 2) {
         if (typeof value !== 'string' || value.length === 0) return value;
         if (value.length <= visibleChars * 2) return '*'.repeat(value.length);
         const head = value.slice(0, visibleChars);
@@ -35,120 +33,101 @@ class Logger {
             const out = {};
             for (const [key, value] of Object.entries(data)) {
                 const isSensitiveKey = SENSITIVE_KEYS.some((k) => key.toLowerCase().includes(k));
-                if (isSensitiveKey && typeof value === 'string') {
-                    out[key] = Logger.mask(value);
-                } else {
-                    out[key] = Logger.maskSensitive(value);
-                }
+                out[key] = isSensitiveKey && typeof value === 'string' ? Logger.mask(value) : Logger.maskSensitive(value);
             }
             return out;
         }
         return data;
     }
 
-    /**
-    * @param {object} params
-    * @param {'pass'|'fail'} params.executionStatus
-    * @param {Error|null} params.error - the failure, if any
-    * @param {object|null} params.locatorUsed - { name, strategy, value } of the last locator resolved by the LocatorEngine, or null
-    * @param {import('@playwright/test').Page} params.page
-    */
-    async logResult({ executionStatus, error = null, locatorUsed = null, page = null }) {
+    // Helpers
+    _safeTitle() {
+        return (this.testInfo?.title || 'test').replace(/[^a-z0-9]/gi, '_');
+    }
+
+    _ensureLogsDir() {
         if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
+    }
 
-        const timestamp = new Date().toISOString();
-        const safeTitle = (this.testInfo?.title || 'Test').replace(/[^a-z0-9]/gi, '_');
-        const baseName = `${safeTitle}_${Date.now()}`;
-
-        const artefacts = {
-            screenshot: null,
-            video: null,
-            trace: null,
-            diagnostics: null, // path to the deep logError() record, fail only
-        };
-
-        if (this.testInfo?.attachments) {
-            const video = this.testInfo.attachments.find((a) => a.name === 'video');
-            const trace = this.testInfo.attachments.find((a) => a.name === 'trace');
-            if (video) artefacts.video = video.path;
-            if (trace) artefacts.trace = trace.path;
+    _existingAttachments() {
+        const attachments = { screenshot: null, video: null, trace: null };
+        for (const a of this.testInfo?.attachments || []) {
+            if (a.name === 'screenshot' && a.path) attachments.screenshot = a.path;
+            if (a.name === 'video' && a.path) attachments.video = a.path;
+            if (a.name === 'trace' && a.path) attachments.trace = a.path;
         }
+        return attachments;
+    }
 
-        if (executionStatus === 'fail' && error) {
-            artefacts.diagnostics = await this.logError(error, page, 'test execution');
-            artefacts.screenshot = this._lastScreenshotPath || null;
+    // Log Writing
+    /**
+     * @param {object} params
+     * @param {'pass'|'fail'} params.status
+     * @param {Error|null} params.error
+     * @param {object|null} params.locatorUsed
+     * @param {import('@playwright/test').Page|null} params.page
+     * @param {number} params.attemptNumber - testInfo.retry + 1
+     */
+    async writeRunLog({ status, error = null, locatorUsed = null, page = null, attemptNumber = 1 }) {
+        this._ensureLogsDir();
+
+        let domExcerpt = null;
+        if (status === 'fail' && page) {
+            try {
+                const fullDom = await page.content();
+                domExcerpt = fullDom.slice(0, DOM_EXCERPT_LIMIT);
+            } catch (e) {
+                domExcerpt = `<unable to capture DOM: ${e.message}>`;
+            }
         }
 
         const record = {
-            timestamp,
+            timestamp: new Date().toISOString(),
             testName: this.testInfo?.title,
-            executionStatus,
-            failureType: executionStatus === 'fail' ? error?.name || 'UnknownError' : null,
+            browser: this.testInfo?.project?.name,
+            attemptNumber,
+            status,
+            steps: this._trace,
+            error: status === 'fail' && error
+                ? { type: error.name, message: error.message, stack: error.stack, domExcerpt }
+                : null,
             locatorUsed: locatorUsed ? Logger.maskSensitive(locatorUsed) : null,
-            artefacts,
         };
 
-        const logFilePath = path.join(LOGS_DIR, `${baseName}.result.json`);
+        const logFilePath = path.join(LOGS_DIR, `${this._safeTitle()}_attempt${attemptNumber}.log.json`);
         fs.writeFileSync(logFilePath, JSON.stringify(record, null, 2));
-
         return logFilePath;
     }
 
+    // Test Result Writing
     /**
-     * @param {Error} error - the thrown error
-     * @param {import('@playwright/test').Page} page - current page, for DOM/screenshot capture
-     * @param {string} step - a short label for what you were doing ("clicking submit")
+     * @param {object} params
+     * @param {'pass'|'fail'} params.status
+     * @param {Error|null} params.error
+     * @param {object|null} params.locatorUsed
+     * @param {string|null} params.runLogPath - path returned by writeRunLog()
      */
+    async writeTestResult({ status, error = null, locatorUsed = null, runLogPath = null }) {
+        this._ensureLogsDir();
 
-    async logError(error, page, step = 'unspecified step') {
-        if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
+        const attachments = this._existingAttachments();
 
-        const timestamp = new Date().toISOString();
-        const safeTitle = (this.testInfo?.title || 'Test').replace(/[^a-z0-9]/gi, '_');
-        const baseName = `${safeTitle}_${Date.now()}`;
-
-        // 1. DOM state - the full rendered HTML at the moment of failure.
-        let domSnapshot = null;
-        try {
-            domSnapshot = page ? await page.content() : null;
-        } catch (e) {
-            domSnapshot = `<unable to capture DOM: ${e.message}>`;
-        }
-
-        // 2. Screenshot evidence.
-        let screenshotPath = null;
-        try {
-            if (page) {
-                screenshotPath = path.join(LOGS_DIR, `${baseName}.png`);
-                await page.screenshot({ path: screenshotPath, fullPage: true });
-            }
-        } catch (e) {
-            screenshotPath = null;
-        }
-
-        // 3. The structured record itself.
         const record = {
-            timestamp,
-            testTitle: this.testInfo?.title,
-            browser: this.testInfo?.project?.name,
-            step,
-            errorType: error.name,
-            errorMessage: error.message,
-            stack: error.stack,
-            domSnapshot,
-            screenshotPath,
+            timestamp: new Date().toISOString(),
+            testName: this.testInfo?.title,
+            executionStatus: status,
+            failureType: status === 'fail' ? error?.name || 'UnknownError' : null,
+            locatorUsed: locatorUsed ? Logger.maskSensitive(locatorUsed) : null,
+            artefacts: {
+                screenshot: attachments.screenshot,
+                video: attachments.video,
+                trace: attachments.trace,
+                runLog: runLogPath,
+            },
         };
 
-        const logFilePath = path.join(LOGS_DIR, `${baseName}.json`);
+        const logFilePath = path.join(LOGS_DIR, `${this._safeTitle()}.result.json`);
         fs.writeFileSync(logFilePath, JSON.stringify(record, null, 2));
-
-        console.error(`[ERROR] Logged failure to ${logFilePath}`);
-
-        // Attach the screenshot to HTML report
-        if (this.testInfo && screenshotPath) {
-            await this.testInfo.attach('failure-screenshot', { path: screenshotPath });
-        }
-
         return logFilePath;
     }
 }

@@ -25,8 +25,8 @@ const STRATEGY_BUILDERS = {
 };
 
 class LocatorEngine {
-    constructor(testInfo) {
-        this.logger = new Logger(testInfo);
+    constructor(logger) {
+        this.logger = logger;
         this.lastUsed = null;
     }
 
@@ -34,7 +34,7 @@ class LocatorEngine {
         const { perStrategyTimeout = 3000, scrollRetries = 2, scrollInterval = 500 } = options;
         const attempts = [];
 
-        for (let round = 0; round <= scrollRetries; round += 1) {
+        for (let round = 0; round <= scrollRetries; round++) {
             for (const strategy of spec.strategies) {
                 const builder = STRATEGY_BUILDERS[strategy.type];
                 if (!builder) {
@@ -69,7 +69,6 @@ class LocatorEngine {
             `All locator strategies failed for "${spec.name}" after ${scrollRetries + 1} scroll round(s).\n` + attempts.join('\n')
         );
         failure.name = 'LocatorResolutionError';
-        await this.logger.logError(failure, page, `resolving locator "${spec.name}"`);
         throw failure;
     }
 
