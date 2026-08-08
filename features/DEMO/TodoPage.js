@@ -10,7 +10,7 @@ class TodoPage {
   }
 
   async goto() {
-    return this.base.step('Navigate to the TodoMVC app', async () => {
+    return this.base.step('Navigate to the TodoMVC page', async () => {
       await this.page.goto('');
       await this.base.wait().waitForNetworkIdle();
     });
@@ -18,7 +18,7 @@ class TodoPage {
 
   /** @param {string} itemText */
   async addItem(itemText) {
-    return this.base.step(`Add a new todo item ("${itemText}")`, async () => {
+    return this.base.step(`Add New Todo Item ("${itemText}")`, async () => {
       const newTodoInput = await this.base.locate(loadLocatorSpec(PAGE_NAME, 'newTodoInput'));
       await newTodoInput.fill(itemText);
       await newTodoInput.press('Enter');
@@ -27,7 +27,7 @@ class TodoPage {
 
   /** @param {string} itemText */
   async verifyItemVisible(itemText) {
-    return this.base.step(`Verify "${itemText}" appears in the list`, async () => {
+    return this.base.step(`Verify "${itemText}" Appears in the List`, async () => {
       await this.base.wait().waitForStableDOM({ timeout: 5000 });
       const spec = loadLocatorSpec(PAGE_NAME, 'todoListItem', { dynamicValue: itemText });
       const todoItem = await this.base.locate(spec);
@@ -36,7 +36,7 @@ class TodoPage {
   }
 
   async markFirstItemComplete() {
-    return this.base.step('Mark the item complete', async () => {
+    return this.base.step('Mark First Todo Item Complete', async () => {
       const completeCheckbox = await this.base.locate(loadLocatorSpec(PAGE_NAME, 'todoCompleteCheckbox'));
       await completeCheckbox.check();
     });
