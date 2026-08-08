@@ -1,6 +1,6 @@
 const base = require('@playwright/test');
-const { TestExecutor } = require('../core/executor/testExecutor');
-const { Logger } = require('../core/logger/logger');
+const { TestExecutor } = require('../../core/executor/testExecutor');
+const { Logger } = require('../../core/logger/logger');
 
 const test = base.test.extend({
     executor: async ({ page }, use, testInfo) => {

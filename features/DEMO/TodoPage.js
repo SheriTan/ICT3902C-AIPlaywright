@@ -1,5 +1,5 @@
 const { BasePage } = require('../BasePage');
-const { loadLocatorSpec } = require('../../utils/locatorLoader')
+const { loadLocatorSpec } = require('../../utils/global/locatorLoader')
 
 const PAGE_NAME = 'todoPage';
 
@@ -11,7 +11,7 @@ class TodoPage {
 
   async goto() {
     return this.base.step('Navigate to the TodoMVC page', async () => {
-      await this.page.goto('');
+      await this.page.goto('/');
       await this.base.wait().waitForNetworkIdle();
     });
   }

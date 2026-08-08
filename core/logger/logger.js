@@ -16,7 +16,7 @@ class Logger {
     }
 
     // Masking
-    static mask(value, visibleChars = 2) {
+    static mask(value, visibleChars = 1) {
         if (typeof value !== 'string' || value.length === 0) return value;
         if (value.length <= visibleChars * 2) return '*'.repeat(value.length);
         const head = value.slice(0, visibleChars);

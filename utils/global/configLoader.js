@@ -4,7 +4,7 @@ const path = require('path');
 
 function loadConfig() {
     const env = (process.env.ENV || 'DEMO').toUpperCase();
-    const configPath = path.join(__dirname, '..', 'config', env, 'config.json');
+    const configPath = path.join(__dirname, '..', '..', 'config', env, 'config.json');
 
     if (!fs.existsSync(configPath)) {
         throw new Error(
@@ -17,7 +17,7 @@ function loadConfig() {
     const config = JSON.parse(raw);
 
     // To retrieve sensitive data based on specified path in config.json (keep it in data/sensitive/ directory)
-    const credsPath = path.join(__dirname, '..', 'config', env, config.credentialsFile || '');
+    const credsPath = path.join(__dirname, '..', '..', 'config', env, config.credentialsFile || '');
     config.credentials = fs.existsSync(credsPath)
         ? JSON.parse(fs.readFileSync(credsPath, 'utf-8'))
         : {};

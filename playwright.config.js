@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
 // custom utils
-const { loadConfig } = require('./utils/configLoader');
+const { loadConfig } = require('./utils/global/configLoader');
 
 const envConfig = loadConfig();
 const PROJECT_ROOT = process.cwd();
@@ -38,7 +38,7 @@ export default defineConfig({
     ['html', { outputFolder: `${path.resolve(PROJECT_ROOT, 'reports')}/html-report`, open: 'never' }],
     ['json', { outputFile: `${path.resolve(PROJECT_ROOT, 'reports')}/results.json` }],
     ['allure-playwright', { resultsDir: 'reports/allure-results' }],
-    ['./utils/logHandler.js'],
+    ['./utils/global/logHandler.js'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

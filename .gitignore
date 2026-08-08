@@ -10,4 +10,4 @@ node_modules/
 
 .github
 .env
-/data/sensitive (do not commit)/*
+/data/sensitive/*

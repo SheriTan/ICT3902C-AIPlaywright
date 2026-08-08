@@ -1,20 +1,22 @@
 {
   "usernameInput": {
     "strategies": [
+      { "type": "label", "value": "Username" },
       { "type": "testId", "value": "username" },
-      { "type": "label", "value": "Username" }
+      { "type": "placeholder", "value": "Your email" }
     ]
   },
   "passwordInput": {
     "strategies": [
+      { "type": "placeholder", "value": "Your password" },
       { "type": "testId", "value": "password" },
       { "type": "label", "value": "Password" }
     ]
   },
   "loginSubmitButton": {
     "strategies": [
-      { "type": "role", "value": { "role": "button", "name": "Log in" } },
-      { "type": "testId", "value": "login-submit" }
+      { "type": "testId", "value": "login-submit" },
+      { "type": "role", "value": { "role": "button", "name": "Login" } }
     ]
   }
 }

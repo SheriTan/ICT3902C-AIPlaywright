@@ -1,14 +1,15 @@
 // COPY THIS FILE to start a new test. Rename it to e.g. "login.spec.js".
 // Run with: npm run test:[env/browser] [test spec file]
-const { test, expect } = require('../utils/templateHandler');
+const { test, expect } = require('../utils/global/templateHandler');
 
 // == Sample Import Feature ==
-// const { LoginPage } = require('../features/LoginPage');
+// const { LoginPage } = require('../features/DEMO/LoginPage');
 
 test.describe('SUITE NAME HERE', () => {
   test('TEST NAME HERE', async ({ page, executor }) => {
     // == Sample Feature Method ==
     // const loginPage = new LoginPage(page, executor);
-    // await loginPage.login('someUser', 'somePassword');F
+    // await loginPage.goto();
+    // await loginPage.loginAs('Jack Howe')
   });
 });

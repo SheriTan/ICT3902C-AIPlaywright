@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const LOCATORS_DIR = path.join(__dirname, '..', 'locators');
+const LOCATORS_DIR = path.join(__dirname, '..', '..', 'locators');
 const cache = new Map();
 
 function loadLocatorFile(pageName) {
