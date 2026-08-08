@@ -1,5 +1,6 @@
 const base = require('@playwright/test');
 const { TestExecutor } = require('../core/executor/testExecutor');
+const { Logger } = require('../core/logger/logger');
 
 const test = base.test.extend({
     executor: async ({ page }, use, testInfo) => {
@@ -7,34 +8,22 @@ const test = base.test.extend({
 
         await use(executor);
 
-        const executionStatus = testInfo.status === 'passed' ? 'pass' : 'fail';
-        const attemptNumber = testInfo.retry + 1; // 1-based: "first run", "second run", ...
-
-        let error = null;
-        if (executionStatus === 'fail' && testInfo.error) {
-            error = new Error(testInfo.error.message || 'Test failed');
-            error.stack = testInfo.error.stack;
+        if (testInfo.status !== 'passed' && !executor.hasAttemptFailureLog()) {
+            executor.recordAttemptFailure();
         }
 
-        const logger = executor.logger;
         const locatorUsed = executor.getLastLocatorUsed();
+        const payload = {
+            steps: executor.logger.getTrace(),
+            locatorUsed: locatorUsed ? Logger.maskSensitive(locatorUsed) : null,
+            failedStep: executor.getLastFailedStep(),
+            errorType: executor.getLastErrorType(),
+        };
 
-        const runLogPath = await logger.writeRunLog({
-            status: executionStatus,
-            error,
-            locatorUsed,
-            page,
-            attemptNumber,
+        await testInfo.attach('execution-trace', {
+            body: Buffer.from(JSON.stringify(payload), 'utf-8'),
+            contentType: 'application/json',
         });
-
-        if (executionStatus === 'pass' || executor.isFinalAttempt) {
-            await logger.writeTestResult({
-                status: executionStatus,
-                error,
-                locatorUsed,
-                runLogPath,
-            });
-        }
     },
 });
 

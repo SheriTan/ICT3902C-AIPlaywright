@@ -7,6 +7,7 @@ class RecoveryEngine {
         this.page = page;
         this.logger = logger;
         this.waitEngine = new WaitEngine(page);
+        this.lastError = null;
     }
 
     /**
@@ -15,27 +16,27 @@ class RecoveryEngine {
      * @param {{retries?: number, label?: string}} options
      */
     async retry(fn, options = {}) {
-        const { retries = 2, label = 'step' } = options;
-        let lastError;
+        const { retries = 0, label = 'step' } = options;
+        this.lastError = null;
 
         for (let attempt = 0; attempt <= retries; attempt += 1) {
             try {
                 return await fn();
             } catch (err) {
-                lastError = err;
+                this.lastError = err;
                 if (attempt < retries) {
-                    const message = `"${label}" failed (attempt ${attempt + 1}/${retries + 1}): ${err.message.split('\n')[0]} - retrying`;
+                    const message = `"${label}" failed (attempt ${attempt + 1}/${retries}): ${err.message.split('\n')[0]} - retrying`;
                     if (this.logger) this.logger.info(message);
                     else console.warn(`[RECOVERY] ${message}`);
-                    await this._runRecoveryActions();
+                    await this.runRecoveryActions();
                 }
             }
         }
 
-        throw lastError;
+        throw this.lastError;
     }
 
-    async _runRecoveryActions() {
+    async runRecoveryActions() {
         try {
             await this.page.keyboard.press('Escape'); // dismiss overlays/tooltips
         } catch (_) { // To Be Added

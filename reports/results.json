@@ -88,6 +88,10 @@
         {
           "resultsDir": "reports/allure-results"
         }
+      ],
+      [
+        "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\utils\\logHandler.js",
+        null
       ]
     ],
     "reportSlowTests": {
@@ -119,7 +123,7 @@
           "specs": [
             {
               "title": "adds a todo item and marks it complete",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -132,145 +136,34 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 31366,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                      },
-                      "errors": [
-                        {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        },
-                        {
-                          "location": {
-                            "file": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js",
-                            "column": 25,
-                            "line": 68
-                          },
-                          "message": "LocatorResolutionError: All locator strategies failed for \"newTodoInput\" after 3 scroll round(s).\nplaceholder -> locator.waitFor: Target page, context or browser has been closed\nrole -> locator.waitFor: Target page, context or browser has been closed\nplaceholder -> locator.waitFor: Target page, context or browser has been closed\nrole -> locator.waitFor: Target page, context or browser has been closed\nplaceholder -> locator.waitFor: Target page, context or browser has been closed\nrole -> locator.waitFor: Target page, context or browser has been closed\n\n\u001b[90m   at \u001b[39m..\\core\\locator-engine\\locatorEngine.js:68\n\n\u001b[0m \u001b[90m 66 |\u001b[39m         \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mlastUsed \u001b[33m=\u001b[39m { name\u001b[33m:\u001b[39m spec\u001b[33m.\u001b[39mname\u001b[33m,\u001b[39m strategy\u001b[33m:\u001b[39m \u001b[32m'unresolved'\u001b[39m\u001b[33m,\u001b[39m value\u001b[33m:\u001b[39m attempts }\u001b[33m;\u001b[39m\n \u001b[90m 67 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 68 |\u001b[39m         \u001b[36mconst\u001b[39m failure \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 69 |\u001b[39m             \u001b[32m`All locator strategies failed for \"${spec.name}\" after ${scrollRetries + 1} scroll round(s).\\n`\u001b[39m \u001b[33m+\u001b[39m attempts\u001b[33m.\u001b[39mjoin(\u001b[32m'\\n'\u001b[39m)\n \u001b[90m 70 |\u001b[39m         )\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m         failure\u001b[33m.\u001b[39mname \u001b[33m=\u001b[39m \u001b[32m'LocatorResolutionError'\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at LocatorEngine.find (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js:68:25)\u001b[22m\n\u001b[2m    at C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\features\\DEMO\\TodoPage.js:22:28\u001b[22m\n\u001b[2m    at RecoveryEngine.retry (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\recovery\\recoveryEngine.js:23:24)\u001b[22m\n\u001b[2m    at TestExecutor._runStep (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\executor\\testExecutor.js:57:20)\u001b[22m\n\u001b[2m    at C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\tests\\example.spec.js:9:5\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 1847,
+                      "errors": [],
                       "stdout": [
                         {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 2/3)\n"
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" resolved via strategy \"placeholder\" on round 1/3\n"
                         },
                         {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 3/3)\n"
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoListItem\" resolved via strategy \"text\" on round 1/3\n"
                         },
                         {
-                          "text": "[INFO] [adds a todo item and marks it complete] \"Add a new todo item (\"Buy milk\")\" failed (attempt 1/3): All locator strategies failed for \"newTodoInput\" after 3 scroll round(s). - retrying\n"
-                        },
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 2/3)\n"
-                        },
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 3/3)\n"
-                        },
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] \"Add a new todo item (\"Buy milk\")\" failed (attempt 2/3): All locator strategies failed for \"newTodoInput\" after 3 scroll round(s). - retrying\n"
-                        },
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 2/3)\n"
-                        },
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 3/3)\n"
+                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"todoCompleteCheckbox\" resolved via strategy \"css\" on round 1/3\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-06T02:41:19.565Z",
+                      "startTime": "2026-08-08T06:14:45.193Z",
                       "annotations": [],
                       "attachments": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium\\error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium\\trace.zip"
+                          "name": "execution-trace",
+                          "contentType": "application/json",
+                          "body": "eyJzdGVwcyI6W3sidGltZXN0YW1wIjoiMjAyNi0wOC0wOFQwNjoxNDo0Ni40MjhaIiwibWVzc2FnZSI6IkxvY2F0b3IgXCJuZXdUb2RvSW5wdXRcIiByZXNvbHZlZCB2aWEgc3RyYXRlZ3kgXCJwbGFjZWhvbGRlclwiIG9uIHJvdW5kIDEvMyJ9LHsidGltZXN0YW1wIjoiMjAyNi0wOC0wOFQwNjoxNDo0Ny4wMDhaIiwibWVzc2FnZSI6IkxvY2F0b3IgXCJ0b2RvTGlzdEl0ZW1cIiByZXNvbHZlZCB2aWEgc3RyYXRlZ3kgXCJ0ZXh0XCIgb24gcm91bmQgMS8zIn0seyJ0aW1lc3RhbXAiOiIyMDI2LTA4LTA4VDA2OjE0OjQ3LjAzM1oiLCJtZXNzYWdlIjoiTG9jYXRvciBcInRvZG9Db21wbGV0ZUNoZWNrYm94XCIgcmVzb2x2ZWQgdmlhIHN0cmF0ZWd5IFwiY3NzXCIgb24gcm91bmQgMS8zIn1dLCJsb2NhdG9yVXNlZCI6eyJuYW1lIjoidG9kb0NvbXBsZXRlQ2hlY2tib3giLCJzdHJhdGVneSI6ImNzcyIsInZhbHVlIjoiLnRvZG8tbGlzdCBsaSAudG9nZ2xlIn0sImZhaWxlZFN0ZXAiOm51bGwsImVycm9yVHlwZSI6bnVsbH0="
                         }
                       ]
-                    },
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 20853,
-                      "error": {
-                        "message": "LocatorResolutionError: All locator strategies failed for \"newTodoInput\" after 3 scroll round(s).\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.",
-                        "stack": "LocatorResolutionError: All locator strategies failed for \"newTodoInput\" after 3 scroll round(s).\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\n    at LocatorEngine.find (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js:68:25)\n    at C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\features\\DEMO\\TodoPage.js:22:28\n    at RecoveryEngine.retry (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\recovery\\recoveryEngine.js:23:24)\n    at TestExecutor._runStep (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\executor\\testExecutor.js:57:20)\n    at C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\tests\\example.spec.js:9:5",
-                        "location": {
-                          "file": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js",
-                          "column": 25,
-                          "line": 68
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39m..\\core\\locator-engine\\locatorEngine.js:68\n\n\u001b[0m \u001b[90m 66 |\u001b[39m         \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mlastUsed \u001b[33m=\u001b[39m { name\u001b[33m:\u001b[39m spec\u001b[33m.\u001b[39mname\u001b[33m,\u001b[39m strategy\u001b[33m:\u001b[39m \u001b[32m'unresolved'\u001b[39m\u001b[33m,\u001b[39m value\u001b[33m:\u001b[39m attempts }\u001b[33m;\u001b[39m\n \u001b[90m 67 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 68 |\u001b[39m         \u001b[36mconst\u001b[39m failure \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 69 |\u001b[39m             \u001b[32m`All locator strategies failed for \"${spec.name}\" after ${scrollRetries + 1} scroll round(s).\\n`\u001b[39m \u001b[33m+\u001b[39m attempts\u001b[33m.\u001b[39mjoin(\u001b[32m'\\n'\u001b[39m)\n \u001b[90m 70 |\u001b[39m         )\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m         failure\u001b[33m.\u001b[39mname \u001b[33m=\u001b[39m \u001b[32m'LocatorResolutionError'\u001b[39m\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js",
-                            "column": 25,
-                            "line": 68
-                          },
-                          "message": "LocatorResolutionError: All locator strategies failed for \"newTodoInput\" after 3 scroll round(s).\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\nplaceholder -> locator.waitFor: Timeout 3000ms exceeded.\nrole -> locator.waitFor: Timeout 3000ms exceeded.\n\n\u001b[90m   at \u001b[39m..\\core\\locator-engine\\locatorEngine.js:68\n\n\u001b[0m \u001b[90m 66 |\u001b[39m         \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mlastUsed \u001b[33m=\u001b[39m { name\u001b[33m:\u001b[39m spec\u001b[33m.\u001b[39mname\u001b[33m,\u001b[39m strategy\u001b[33m:\u001b[39m \u001b[32m'unresolved'\u001b[39m\u001b[33m,\u001b[39m value\u001b[33m:\u001b[39m attempts }\u001b[33m;\u001b[39m\n \u001b[90m 67 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 68 |\u001b[39m         \u001b[36mconst\u001b[39m failure \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 69 |\u001b[39m             \u001b[32m`All locator strategies failed for \"${spec.name}\" after ${scrollRetries + 1} scroll round(s).\\n`\u001b[39m \u001b[33m+\u001b[39m attempts\u001b[33m.\u001b[39mjoin(\u001b[32m'\\n'\u001b[39m)\n \u001b[90m 70 |\u001b[39m         )\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m         failure\u001b[33m.\u001b[39mname \u001b[33m=\u001b[39m \u001b[32m'LocatorResolutionError'\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at LocatorEngine.find (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js:68:25)\u001b[22m\n\u001b[2m    at C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\features\\DEMO\\TodoPage.js:22:28\u001b[22m\n\u001b[2m    at RecoveryEngine.retry (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\recovery\\recoveryEngine.js:23:24)\u001b[22m\n\u001b[2m    at TestExecutor._runStep (C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\executor\\testExecutor.js:57:20)\u001b[22m\n\u001b[2m    at C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\tests\\example.spec.js:9:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 2/3)\n"
-                        },
-                        {
-                          "text": "[INFO] [adds a todo item and marks it complete] Locator \"newTodoInput\" not found - scrolling and retrying (round 3/3)\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-08-06T02:41:52.385Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium-retry1\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium-retry1\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium-retry1\\error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\test-results\\example-TodoMVC---add-and--5cb06--item-and-marks-it-complete-chromium-retry1\\trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\sitwl\\OneDrive\\Documents\\GitHub\\ICT3902C-AIPlaywright\\core\\locator-engine\\locatorEngine.js",
-                        "column": 25,
-                        "line": 68
-                      }
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "dd9b2edffe9b7501040c-2e17c75c1130ffe698f5",
@@ -285,11 +178,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-06T02:41:18.523Z",
-    "duration": 55134.123,
-    "expected": 0,
+    "startTime": "2026-08-08T06:14:44.332Z",
+    "duration": 3104.599,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }
