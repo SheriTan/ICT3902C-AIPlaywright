@@ -2,7 +2,6 @@ const { loadConfig } = require('../global/configLoader');
 
 function getUserByName(name) {
     const config = loadConfig();
-    console.log(config);
     const users = [
         ...(config.credentials.admin || []),
         ...(config.credentials.user || [])

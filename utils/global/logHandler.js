@@ -1,7 +1,39 @@
 const fs = require('fs');
 const path = require('path');
 
-const LOGS_DIR = path.join(__dirname, '..', '..', 'logs');
+const PROJECT_ROOT = path.join(__dirname, '..', '..');
+const LOGS_DIR = path.join(PROJECT_ROOT, 'logs');
+
+/**
+ * Artefact paths used to be written as absolute paths belonging to whatever
+ * machine ran the test (e.g. C:\Users\...\trace.zip). That makes the logs
+ * non-portable: the AI layer and the report cannot resolve them on another
+ * machine, in CI, or after the repo is moved. 
+ * 
+ * Everything is stored relative to the project root with forward slashes, so the same log reads correctly
+ */
+function toRelative(absPath) {
+    if (!absPath) return null;
+    try {
+        return path.relative(PROJECT_ROOT, absPath).split(path.sep).join('/');
+    } catch (_) {
+        return absPath;
+    }
+}
+
+function collectArtefacts(result) {
+    const artefacts = { screenshot: null, video: null, trace: null, errorContext: null };
+
+    for (const attachment of result.attachments || []) {
+        if (!attachment.path) continue;
+        if (attachment.name === 'screenshot') artefacts.screenshot = toRelative(attachment.path);
+        if (attachment.name === 'video') artefacts.video = toRelative(attachment.path);
+        if (attachment.name === 'trace') artefacts.trace = toRelative(attachment.path);
+        if (attachment.name === 'error-context') artefacts.errorContext = toRelative(attachment.path);
+    }
+
+    return artefacts;
+}
 
 class LogHandler {
     constructor() {
@@ -15,13 +47,7 @@ class LogHandler {
         const isFinalAttempt = status === 'pass' || attemptNumber === totalAttempts;
 
         const customData = this._readExecutionTrace(result);
-
-        const finalAttachments = { screenshot: null, video: null, trace: null };
-        for (const a of result.attachments || []) {
-            if (a.name === 'screenshot' && a.path) finalAttachments.screenshot = a.path;
-            if (a.name === 'video' && a.path) finalAttachments.video = a.path;
-            if (a.name === 'trace' && a.path) finalAttachments.trace = a.path;
-        }
+        const artefacts = collectArtefacts(result);
 
         const attemptRecord = {
             attemptNumber,
@@ -29,6 +55,8 @@ class LogHandler {
             durationMs: result.duration,
             steps: customData.steps || [],
             locatorUsed: customData.locatorUsed || null,
+            failedStep: customData.failedStep || null,
+            artefacts,
             error: result.error
                 ? { type: customData.errorType || 'Error', message: result.error.message, stack: result.error.stack }
                 : null,
@@ -54,6 +82,9 @@ class LogHandler {
             runId,
             timestamp: new Date().toISOString(),
             testName: test.title,
+            suite: test.parent?.title || null,
+            file: test.location?.file ? toRelative(test.location.file) : null,
+            line: test.location?.line ?? null,
             browser: browserName,
             totalAttempts,
             overallStatus: status,
@@ -65,18 +96,17 @@ class LogHandler {
             runId,
             timestamp: new Date().toISOString(),
             testName: test.title,
+            suite: test.parent?.title || null,
+            browser: browserName,
+            durationMs: attemptRecord.durationMs,
             executionStatus: status,
             failureType: status === 'fail' ? (attemptRecord.error?.type || 'UnknownError') : null,
             locatorUsed: attemptRecord.locatorUsed,
             artefacts: {
-                screenshot: finalAttachments.screenshot,
-                video: finalAttachments.video,
-                trace: finalAttachments.trace,
-                completeLog: completeLogPath,
+                ...artefacts,
+                completeLog: toRelative(completeLogPath),
             },
         }, null, 2));
-
-        this._cleanupOlderAttemptDirs(result.outputDir);
     }
 
     _readExecutionTrace(result) {
@@ -91,27 +121,8 @@ class LogHandler {
                 return JSON.parse(fs.readFileSync(attachment.path, 'utf-8'));
             }
         } catch (_) {
-            // Malformed/missing trace attachment should not break reporting
         }
         return {};
-    }
-
-    _cleanupOlderAttemptDirs(currentOutputDir) {
-        if (!currentOutputDir) return;
-        try {
-            const parent = path.dirname(currentOutputDir);
-            const currentBase = path.basename(currentOutputDir);
-            const rootName = currentBase.replace(/-retry\d+$/, '');
-            if (!fs.existsSync(parent)) return;
-
-            const familyPattern = new RegExp(`^${rootName}(-retry\\d+)?$`);
-            for (const name of fs.readdirSync(parent)) {
-                if (name !== currentBase && familyPattern.test(name)) {
-                    fs.rmSync(path.join(parent, name), { recursive: true, force: true });
-                }
-            }
-        } catch (_) {
-        }
     }
 }
 

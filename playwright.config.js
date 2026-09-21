@@ -1,28 +1,48 @@
-// @ts-check
-import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
+const path = require('path');
+const { defineConfig, devices } = require('@playwright/test');
+
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 // custom utils
 const { loadConfig } = require('./utils/global/configLoader');
 
 const envConfig = loadConfig();
-const PROJECT_ROOT = process.cwd();
+
+const PROJECT_ROOT = __dirname;
+const REPORTS_DIR = path.join(PROJECT_ROOT, 'reports');
+
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+ * @param {string} name
+ * @returns {boolean}
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+function envEnabled(name) {
+  const value = process.env[name];
+  if (value === undefined) return false;
+  return !['0', 'false', 'no', 'off', ''].includes(value.trim().toLowerCase());
+}
+
+/**
+ * @type {import('@playwright/test').ReporterDescription[]}
+ */
+const reporters = [
+  ['list'],
+  ['json', { outputFile: path.join(REPORTS_DIR, 'results.json') }],
+  ['./utils/global/logHandler.js'],
+  ['./utils/global/aiReporter.js'],
+];
+
+if (envEnabled('HTML_REPORT')) {
+  reporters.push(['html', { outputFolder: path.join(REPORTS_DIR, 'html-report'), open: 'never' }]);
+}
 
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
-export default defineConfig({
+module.exports = defineConfig({
   testDir: './tests',
-  timeout: envConfig.timeout, // max test exeuction duration
-  retries: envConfig.retries, // Max retries on failed test execution
-  
+  timeout: envConfig.timeout, // max test execution duration
+  retries: envConfig.retries, // max retries on failed test execution
+
   // Defaults from Playwright framework
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -31,15 +51,9 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
 
-
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['list'],
-    ['html', { outputFolder: `${path.resolve(PROJECT_ROOT, 'reports')}/html-report`, open: 'never' }],
-    ['json', { outputFile: `${path.resolve(PROJECT_ROOT, 'reports')}/results.json` }],
-    ['allure-playwright', { resultsDir: 'reports/allure-results' }],
-    ['./utils/global/logHandler.js'],
-  ],
+  reporter: reporters,
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -50,8 +64,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
     // Capture screenshot after each test failure.
     screenshot: 'only-on-failure',
-    // Record video only when retrying a test for the first time.
-    video: 'retain-on-failure'
+    // Record video on failure so the report can embed it.
+    video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -60,12 +74,10 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
@@ -99,4 +111,3 @@ export default defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 });
-

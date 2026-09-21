@@ -10,4 +10,5 @@ node_modules/
 
 .github
 .env
+.vscode
 /data/sensitive/*
