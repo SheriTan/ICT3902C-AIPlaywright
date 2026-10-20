@@ -18,29 +18,22 @@ async function generate(prompt, options = {}) {
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
   const { temperature = 0.2 } = options;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
   let response;
-
   try {
     response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // The key goes in a header (not the URL) so it cannot leak into logs or error messages
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: { temperature, maxOutputTokens: 800 },
       }),
     });
   } catch (err) {
-    console.error('\n========== GEMINI FETCH ERROR ==========');
-    console.error('name:', err?.name);
-    console.error('message:', err?.message);
-    console.error('cause:', err?.cause);
-    console.error('cause code:', err?.cause?.code);
-    console.error('cause message:', err?.cause?.message);
-    console.error('stack:', err?.stack);
-    console.error('URL:', url.replace(apiKey, '[REDACTED]'));
-    throw err;
+    const reason = err.cause?.code || err.cause?.message || err.message;
+    throw new Error(`Could not reach the Gemini API (${reason}).`, { cause: err });
   }
 
   if (!response.ok) {

@@ -1,21 +1,20 @@
-// Environment switches (all optional):
+// Playwright reporter: after every run it (optionally) asks the AI provider to diagnose the failures and
+// then rebuilds the AI report (reports/ai-report/index.html). Registered in playwright.config.js.
+//
+// Environment switches (all optional, 0/false/no/off disables):
+//   AI_REPORT=0       disable this reporter entirely
 //   AI_DIAGNOSE=0     skip the AI step, just rebuild the report
-//   AI_DIAGNOSE=1     force the AI step even when it would be skipped
+//   AI_DIAGNOSE=1     force the AI step even when no provider looks configured
 //   AI_COMPARE=1      run every prompt variant instead of just the default
 //   AI_REPORT_OPEN=1  open the report in the browser when the run finishes
-//   AI_REPORT=0       disable this reporter entirely
 
 const { generateReport } = require('./generateReport');
 const { analyzeFailures } = require('./analyzeFailures');
-const { AiClient } = require('../../core/ai-engine/aiClient');
-
-function envFlag(name) {
-  const value = process.env[name];
-  if (value === undefined) return undefined;
-  return !['0', 'false', 'no', ''].includes(String(value).toLowerCase());
-}
+const { AiClient } = require('../ai-engine/aiClient');
+const { envFlag } = require('../../utils/global/env');
 
 class AiReporter {
+  /** @param {{ open?: boolean, compare?: boolean, inline?: boolean }} [options] - defaults, overridden by env switches */
   constructor(options = {}) {
     this.options = options;
     this.failed = 0;

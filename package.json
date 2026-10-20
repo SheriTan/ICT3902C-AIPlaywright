@@ -9,18 +9,13 @@
     "test:dev": "cross-env ENV=DEV playwright test",
     "test:uat": "cross-env ENV=UAT playwright test",
     "test:prod": "cross-env ENV=PROD playwright test",
-    "test:chromium": "playwright test --project=chromium",
-    "test:firefox": "playwright test --project=firefox",
-    "test:webkit": "playwright test --project=webkit",
     "test:html": "cross-env HTML_REPORT=1 playwright test",
-    "report": "node utils/global/generateReport.js --open",
-    "report:ai": "node utils/global/generateReport.js",
-    "report:latest": "node utils/global/generateReport.js --latest --open",
-    "report:portable": "node utils/global/generateReport.js --inline",
+    "report": "node core/reporting/generateReport.js --open",
     "report:html": "playwright show-report reports/html-report",
-    "analyze": "node utils/global/analyzeFailures.js",
-    "analyze:compare": "node utils/global/analyzeFailures.js --compare",
-    "diagnose": "npm run analyze && node utils/global/generateReport.js --open"
+    "analyze": "node core/reporting/analyzeFailures.js",
+    "diagnose": "npm run analyze && npm run report",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -30,6 +25,7 @@
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
     "cross-env": "^10.1.0",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "prettier": "^3.9.10"
   }
 }

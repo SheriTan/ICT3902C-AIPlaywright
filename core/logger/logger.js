@@ -1,41 +1,25 @@
-const SENSITIVE_KEYS = ['password', 'nric', 'fin', 'passport', 'username', 'userid', 'email', 'token', 'secret', 'apiKey', 'api_key', 'authorization'];
+// Per-test logger. Every message is redacted (see sensitiveData.js), kept in memory so the
+// fixture can attach it to the test as the "execution-trace", and echoed to the console.
+
+const { redactString } = require('./sensitiveData');
 
 class Logger {
-    constructor(testInfo) {
-        this.testInfo = testInfo;
-        this._trace = [];
-    }
+  /** @param {import('@playwright/test').TestInfo} testInfo */
+  constructor(testInfo) {
+    this.testInfo = testInfo;
+    this._trace = [];
+  }
 
-    info(message) {
-        this._trace.push({ timestamp: new Date().toISOString(), message });
-        console.log(`[INFO] [${this.testInfo?.title || 'unknown test'}] ${message}`);
-    }
+  info(message) {
+    const safeMessage = redactString(String(message));
+    this._trace.push({ timestamp: new Date().toISOString(), message: safeMessage });
+    console.log(`[INFO] [${this.testInfo?.title || 'unknown test'}] ${safeMessage}`);
+  }
 
-    getTrace() {
-        return this._trace;
-    }
-
-    // Masking
-    static mask(value, visibleChars = 1) {
-        if (typeof value !== 'string' || value.length === 0) return value;
-        if (value.length <= visibleChars * 2) return '*'.repeat(value.length);
-        const head = value.slice(0, visibleChars);
-        const tail = value.slice(-visibleChars);
-        return `${head}${'*'.repeat(value.length - visibleChars * 2)}${tail}`;
-    }
-
-    static maskSensitive(data) {
-        if (Array.isArray(data)) return data.map((item) => Logger.maskSensitive(item));
-        if (data && typeof data === 'object') {
-            const out = {};
-            for (const [key, value] of Object.entries(data)) {
-                const isSensitiveKey = SENSITIVE_KEYS.some((k) => key.toLowerCase().includes(k));
-                out[key] = isSensitiveKey && typeof value === 'string' ? Logger.mask(value) : Logger.maskSensitive(value);
-            }
-            return out;
-        }
-        return data;
-    }
+  /** @returns {Array<{ timestamp: string, message: string }>} */
+  getTrace() {
+    return this._trace;
+  }
 }
 
 module.exports = { Logger };

@@ -1,0 +1,7 @@
+node_modules/
+logs/
+reports/
+test-results/
+data/sensitive/
+package-lock.json
+core/reporting/report-assets/report.html

@@ -1,0 +1,6 @@
+{
+  "env": "SIT",
+  "baseURL": "https://demo.playwright.dev/todomvc/",
+  "timeout": 30000,
+  "retries": 0
+}

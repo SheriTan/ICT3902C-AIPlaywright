@@ -5,34 +5,23 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 // custom utils
 const { loadConfig } = require('./utils/global/configLoader');
+const { envFlag } = require('./utils/global/env');
+const { JSON_RESULTS_PATH, HTML_REPORT_DIR } = require('./utils/global/paths');
 
 const envConfig = loadConfig();
-
-const PROJECT_ROOT = __dirname;
-const REPORTS_DIR = path.join(PROJECT_ROOT, 'reports');
-
-/**
- * @param {string} name
- * @returns {boolean}
- */
-function envEnabled(name) {
-  const value = process.env[name];
-  if (value === undefined) return false;
-  return !['0', 'false', 'no', 'off', ''].includes(value.trim().toLowerCase());
-}
 
 /**
  * @type {import('@playwright/test').ReporterDescription[]}
  */
 const reporters = [
   ['list'],
-  ['json', { outputFile: path.join(REPORTS_DIR, 'results.json') }],
-  ['./utils/global/logHandler.js'],
-  ['./utils/global/aiReporter.js'],
+  ['json', { outputFile: JSON_RESULTS_PATH }],
+  ['./core/reporting/logReporter.js'], // writes /logs; must come before the AI reporter, which reads them
+  ['./core/reporting/aiReporter.js'],
 ];
 
-if (envEnabled('HTML_REPORT')) {
-  reporters.push(['html', { outputFolder: path.join(REPORTS_DIR, 'html-report'), open: 'never' }]);
+if (envFlag('HTML_REPORT')) {
+  reporters.push(['html', { outputFolder: HTML_REPORT_DIR, open: 'never' }]);
 }
 
 /**

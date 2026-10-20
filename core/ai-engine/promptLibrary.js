@@ -1,7 +1,7 @@
 // Prompt Library for the AI Intelligence Layer
 //
 // Runs the same failure log through several prompting strategies and
-// compare the outputs side-by-side (see scripts/analyzeFailures.js --compare)
+// compare the outputs side-by-side (see core/reporting/analyzeFailures.js --compare)
 //
 // Every variant is required to end its instructions by demanding a single
 // fenced ```json block so DiagnosisEngine can parse the result the same way.
@@ -35,7 +35,7 @@ const PROMPT_VARIANTS = {
   /**
    * Fast + cheap. Minimises tokens so it is safe to run on every CI
    * failure without burning through a free-tier rate limit. Good default
-   * for "always-on" diagnosis attached to the Allure report.
+   * for "always-on" diagnosis shown in the AI report.
    */
   concise: {
     label: 'Concise Direct-Answer',

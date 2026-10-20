@@ -1,5 +1,5 @@
-const { test, expect } = require('../utils/global/templateHandler');
-const { TodoPage } = require('../features/DEMO/TodoPage');
+const { test, expect } = require('../core/fixtures');
+const { TodoPage } = require('../features/SIT/TodoPage');
 
 test.describe('TodoMVC - add and complete an item', () => {
   test('adds a todo item and marks it complete', async ({ page, executor }) => {

@@ -9,7 +9,7 @@ const MAX_ATTEMPT_LINES = 8; // keep prompts small - cheaper + faster on free ti
 
 /**
  * Converts one attempt entry from a *.complete.log.json file (see
- * logHandler.js) into the compact context object the prompt library needs.
+ * logReporter.js) into the compact context object the prompt library needs.
  *
  * @param {object} completeLog - parsed *.complete.log.json
  * @returns {object} failure context
@@ -32,9 +32,7 @@ function buildFailureContext(completeLog) {
     .join('\n');
 
   // Step messages look like: "<Step Name>" failed (attempt 1/2): <error> - retrying
-  const failedStepMatch = steps
-    .map((s) => s.message)
-    .find((m) => /^".*" failed/.test(m));
+  const failedStepMatch = steps.map((s) => s.message).find((m) => /^".*" failed/.test(m));
   const failedStep = failedStepMatch ? failedStepMatch.match(/^"(.*)" failed/)[1] : undefined;
 
   return {
@@ -76,9 +74,7 @@ function parseModelResponse(raw) {
 
   let lastError = null;
   for (const candidate of candidates) {
-    const cleaned = candidate
-      .trim()
-      .replace(/,(\s*[}\]])/g, '$1');
+    const cleaned = candidate.trim().replace(/,(\s*[}\]])/g, '$1');
 
     if (!cleaned) continue;
 
@@ -144,9 +140,7 @@ async function diagnoseFailure(completeLog, options = {}) {
   const { variants = ['concise'], client = new AiClient(), temperature = 0.2 } = options;
 
   if (!client.isConfigured()) {
-    throw new Error(
-      `AI provider "${client.name}" is not configured. Check your .env file (see .env.example).`
-    );
+    throw new Error(`AI provider "${client.name}" is not configured. Check your .env file (see .env.example).`);
   }
 
   const context = buildFailureContext(completeLog);
