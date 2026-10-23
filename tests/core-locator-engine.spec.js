@@ -1,230 +1,153 @@
 const { test, expect } = require('../core/fixtures');
-const { LocatorEngine, describeStrategy } = require('../core/locator-engine/locatorEngine');
-const { checkLocatorStrategies } = require('../core/locator-engine/strategyChecker');
+const { describeStrategy } = require('../core/locator-engine/locatorEngine');
+const { LocatorFixturePage } = require('../features/LocatorFixturePage');
 
-// ---------------------------------------------------------------------------
-// What this file proves
-// ---------------------------------------------------------------------------
-// LocatorEngine takes a ranked list of strategies (testId > role > label > ...)
-// and tries them top to bottom. These tests run against a tiny local HTML page
-// (no network, no demo website) so that every result is repeatable and each
-// failure points at the locator engine rather than at a site change.
+// Tests the locator engine and strategy checker against a local HTML page (data/locator-fixture.html)
+// through the LocatorFixturePage page object. Locators are in locators/locatorFixturePage.locators.json.
 //
-//   Group 1  Single strategy   each of the 7 strategy types can find an element
-//   Group 2  Ranking           rank 1 wins when everything works
-//   Group 3  Fallback          a broken rank is skipped and the next one is used
-//   Group 4  Failure           when nothing matches, the error lists every attempt
-//   Group 5  Strategy checker  the checker utility validates whole ranked lists
-//
-// Every test writes a PURPOSE line, then runs named steps through executor.step().
-// Those names (and the engine's own "Locator ... resolved via ..." lines) are what
-// the AI report shows as the step timeline.
+//   1. Single strategy: each strategy of each locator can find its element on its own
+//   2. Unique selectors: every css / xpath strategy matches exactly one element
+//   3. Ranking: Rank 1 wins when everything works
+//   4. Fallback: Broken rank is skipped and the next one is used
+//   5. Failure reporting: Nothing matches. Error lists every attempt
+//   6. Strategy checker: Validates whole ranked lists, and flags a loose css selector
 
-const FIXTURE_HTML = `<!doctype html><html><body>
-  <label for="email">Email address</label>
-  <input id="email" data-testid="email-input" placeholder="Your email" />
-  <label for="password">Password</label>
-  <input id="password" data-testid="password-input" placeholder="Your password" />
-  <button id="sign-in" data-testid="login-submit">Sign in</button>
-  <p id="status">Ready to sign in</p>
-</body></html>`;
+// Elements on the fixture page and the tag each locator must resolve to
+const TARGETS = [
+  { locator: 'emailInput', description: 'email input', tag: 'INPUT' },
+  { locator: 'passwordInput', description: 'password input', tag: 'INPUT' },
+  { locator: 'signInButton', description: 'Sign in button', tag: 'BUTTON' },
+  { locator: 'statusMessage', description: 'status message', tag: 'P' },
+];
 
-const FIXTURE_SUMMARY = 'Email input, Password input, "Sign in" button, "Ready to sign in" text';
-
-// Deterministic checks must not be silently retried by the executor, so every
-// step here runs once (retries: 0). A failure is then reported at the step that caused it.
 const stepsFor = (executor) => (name, fn) => executor.step(name, fn, { retries: 0 });
 
 test.describe('Locator strategy engine - deterministic checks', () => {
   test.beforeEach(async ({ page, executor }) => {
-    await stepsFor(executor)(`Load local HTML fixture (${FIXTURE_SUMMARY})`, async () => {
-      await page.setContent(FIXTURE_HTML);
-    });
+    await new LocatorFixturePage(page, executor).goto();
   });
 
-  // -------------------------------------------------------------------------
-  // Group 1 - one strategy at a time
-  // -------------------------------------------------------------------------
-  const strategyCases = [
-    {
-      title: 'testId',
-      target: 'email input',
-      expected: 'INPUT',
-      spec: { name: 'emailInput', strategies: [{ type: 'testId', value: 'email-input' }] },
-    },
-    {
-      title: 'role',
-      target: 'Sign in button',
-      expected: 'BUTTON',
-      spec: {
-        name: 'signInButton',
-        strategies: [{ type: 'role', value: { role: 'button', name: 'Sign in', exact: true } }],
-      },
-    },
-    {
-      title: 'label',
-      target: 'email input',
-      expected: 'INPUT',
-      spec: { name: 'emailInput', strategies: [{ type: 'label', value: 'Email address' }] },
-    },
-    {
-      title: 'placeholder',
-      target: 'password input',
-      expected: 'INPUT',
-      spec: { name: 'passwordInput', strategies: [{ type: 'placeholder', value: 'Your password' }] },
-    },
-    {
-      title: 'text',
-      target: 'status message',
-      expected: 'P',
-      spec: { name: 'statusMessage', strategies: [{ type: 'text', value: 'Ready to sign in' }] },
-    },
-    {
-      title: 'css',
-      target: 'Sign in button',
-      expected: 'BUTTON',
-      spec: { name: 'signInButton', strategies: [{ type: 'css', value: '#sign-in' }] },
-    },
-    {
-      title: 'xpath',
-      target: 'Sign in button',
-      expected: 'BUTTON',
-      spec: { name: 'signInButton', strategies: [{ type: 'xpath', value: "//*[@id='sign-in']" }] },
-    },
-  ];
+  // Single strategy
+  for (const target of TARGETS) {
+    for (const type of LocatorFixturePage.strategyTypesOf(target.locator)) {
+      test(`Single strategy [${type}] finds the ${target.description}`, async ({ page, executor }) => {
+        const step = stepsFor(executor);
+        const fixturePage = new LocatorFixturePage(page, executor);
+        const spec = fixturePage.singleStrategySpec(target.locator, type);
+        const expectedTag = target.tag.toLowerCase();
 
-  for (const item of strategyCases) {
-    test(`Single strategy [${item.title}] finds the ${item.target}`, async ({ executor }) => {
-      const step = stepsFor(executor);
-      const strategy = item.spec.strategies[0];
-      const engine = new LocatorEngine(executor.logger);
-      let locator;
+        executor.logger.info(
+          `PURPOSE: prove "${type}" strategy can locate the ${target.description}. ` +
+            `Expected result: a visible <${expectedTag}> element.`
+        );
 
-      executor.logger.info(
-        `PURPOSE: prove the "${item.title}" strategy alone can locate the ${item.target}. ` +
-          `Expected result: a visible <${item.expected.toLowerCase()}> element.`
-      );
+        const { locator, strategyUsed } = await fixturePage.resolve(
+          `Resolve "${spec.name}" using only ${describeStrategy(spec.strategies[0])}`,
+          spec
+        );
 
-      await step(`Resolve "${item.spec.name}" using only ${describeStrategy(strategy)}`, async () => {
-        locator = await engine.find(executor.page, item.spec, { perStrategyTimeout: 500, scrollRounds: 1 });
+        await step('Check the located element is visible on the page', async () => {
+          await expect(locator).toBeVisible();
+        });
+
+        await step(`Check the element is a <${expectedTag}> tag (the ${target.description})`, async () => {
+          expect(await locator.evaluate((el) => el.tagName)).toBe(target.tag);
+        });
+
+        await step(`Check the engine recorded "${type}" as the strategy used`, async () => {
+          expect(strategyUsed).toBe(type);
+        });
       });
-
-      await step('Check the located element is visible on the page', async () => {
-        await expect(locator).toBeVisible();
-      });
-
-      await step(`Check the element is a <${item.expected.toLowerCase()}> tag (the ${item.target})`, async () => {
-        expect(await locator.evaluate((el) => el.tagName)).toBe(item.expected);
-      });
-
-      await step(`Check the engine recorded "${item.title}" as the strategy used`, async () => {
-        expect(engine.lastUsed.strategy).toBe(strategy.type);
-      });
-    });
+    }
   }
 
-  // -------------------------------------------------------------------------
-  // Group 2 - ranking
-  // -------------------------------------------------------------------------
-  test('Ranking: rank 1 (testId) wins when every strategy can resolve', async ({ executor }) => {
+  // Unique selectors
+  test('Every css and xpath strategy matches exactly one element', async ({ page, executor }) => {
     const step = stepsFor(executor);
-    const engine = new LocatorEngine(executor.logger);
-    const spec = {
-      name: 'signInButton',
-      strategies: [
-        { type: 'testId', value: 'login-submit' },
-        { type: 'role', value: { role: 'button', name: 'Sign in', exact: true } },
-        { type: 'css', value: '#sign-in' },
-        { type: 'xpath', value: "//*[@id='sign-in']" },
-      ],
-    };
-    let locator;
+    const fixturePage = new LocatorFixturePage(page, executor);
 
     executor.logger.info(
-      'PURPOSE: with 4 working strategies for the same button, the engine must stop at the highest ' +
-        'ranked one (testId) and never touch the lower ranks.'
+      'PURPOSE: the engine only uses the first match, so a loose css/xpath would silently pick a decoy ' +
+        'Validate css and xpath to match with exactly one element.'
+    );
+
+    for (const target of TARGETS) {
+      const selectors = fixturePage.spec(target.locator).strategies.filter((s) => ['css', 'xpath'].includes(s.type));
+      for (const strategy of selectors) {
+        await step(`Check ${describeStrategy(strategy)} matches exactly one element (${target.description})`, async () => {
+          expect(await fixturePage.countMatches(strategy)).toBe(1);
+        });
+      }
+    }
+  });
+
+  // Ranking
+  test('Rank 1 wins when every strategy can resolve', async ({ page, executor }) => {
+    const step = stepsFor(executor);
+    const fixturePage = new LocatorFixturePage(page, executor);
+    const spec = fixturePage.spec('signInButton');
+
+    executor.logger.info(
+      'PURPOSE: validate engine stops at rank one (testId) when there are 4 working strategies for the same button'
     );
     spec.strategies.forEach((s, i) => executor.logger.info(`Rank ${i + 1}: ${describeStrategy(s)} (working)`));
 
-    await step('Resolve "signInButton" using the full ranked list', async () => {
-      locator = await engine.find(executor.page, spec, { perStrategyTimeout: 500, scrollRounds: 1 });
-    });
+    const { locator, strategyUsed } = await fixturePage.resolve('Resolve "signInButton" using the full ranked list', spec);
 
-    await step('Check the located element is the "Sign in" button', async () => {
+    await step('Check the located element is the "Sign in" button (not the SSO decoy)', async () => {
       await expect(locator).toHaveText('Sign in');
     });
 
     await step('Check the engine used rank 1 (testId)', async () => {
-      expect(engine.lastUsed.strategy).toBe('testId');
+      expect(strategyUsed).toBe('testId');
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Group 3 - fallback
-  // -------------------------------------------------------------------------
-  test('Fallback: a broken rank 1 is skipped and rank 2 (role) takes over', async ({ executor }) => {
+  // Fallback
+  test('Broken rank 1 is skipped and rank 2 takes over', async ({ page, executor }) => {
     const step = stepsFor(executor);
-    const engine = new LocatorEngine(executor.logger);
-    const spec = {
-      name: 'signInButton',
-      strategies: [
-        { type: 'testId', value: 'missing-test-id' },
-        { type: 'role', value: { role: 'button', name: 'Sign in', exact: true } },
-        { type: 'css', value: '#sign-in' },
-      ],
-    };
-    let locator;
+    const fixturePage = new LocatorFixturePage(page, executor);
+    const spec = fixturePage.spec('brokenRank1SignIn');
 
     executor.logger.info(
-      'PURPOSE: simulate a page change that breaks the preferred locator. The engine should skip ' +
+      'PURPOSE: Simulate page change that breaks the preferred locator. Validate the engine skipping ' +
         'the dead testId, fall back to the next rank (role) and still find the button.'
     );
     executor.logger.info(`Rank 1: ${describeStrategy(spec.strategies[0])} (DELIBERATELY BROKEN - no such element)`);
     executor.logger.info(`Rank 2: ${describeStrategy(spec.strategies[1])} (working - expected to be used)`);
     executor.logger.info(`Rank 3: ${describeStrategy(spec.strategies[2])} (working - expected to be unused)`);
 
-    await step('Resolve "signInButton" while rank 1 does not exist on the page', async () => {
-      locator = await engine.find(executor.page, spec, { perStrategyTimeout: 250, scrollRounds: 1 });
-    });
+    const { locator, strategyUsed } = await fixturePage.resolve(
+      'Resolve "brokenRank1SignIn" while rank 1 does not exist on the page',
+      spec,
+      { timeout: 250 }
+    );
 
     await step('Check the fallback still found the "Sign in" button', async () => {
       await expect(locator).toHaveText('Sign in');
     });
 
     await step('Check the engine fell back to rank 2 (role), not rank 1 or rank 3', async () => {
-      expect(engine.lastUsed.strategy).toBe('role');
+      expect(strategyUsed).toBe('role');
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Group 4 - failure reporting
-  // -------------------------------------------------------------------------
-  test('Failure: when no strategy matches, the error lists every attempt', async ({ executor }) => {
+  // Failure reporting
+  test('Failure: when no strategy matches, the error lists every attempt', async ({ page, executor }) => {
     const step = stepsFor(executor);
-    const engine = new LocatorEngine(executor.logger);
-    const spec = {
-      name: 'ghostButton',
-      strategies: [
-        { type: 'testId', value: 'no-such-test-id' },
-        { type: 'css', value: '#no-such-id' },
-      ],
-    };
-    let error;
+    const fixturePage = new LocatorFixturePage(page, executor);
+    const spec = fixturePage.spec('unresolvableButton');
 
     executor.logger.info(
-      'PURPOSE: confirm the engine fails loudly (LocatorResolutionError) when nothing matches, and that ' +
-        'the message names each strategy tried. The AI diagnosis relies on this detail.'
+      'PURPOSE: Confirm the engine fails (LocatorResolutionError) when nothing matches, and that ' +
+        'the message names each strategy tried.'
     );
-    spec.strategies.forEach((s, i) =>
-      executor.logger.info(`Rank ${i + 1}: ${describeStrategy(s)} (DELIBERATELY BROKEN)`)
-    );
+    spec.strategies.forEach((s, i) => executor.logger.info(`Rank ${i + 1}: ${describeStrategy(s)} (DELIBERATELY BROKEN)`));
 
-    await step('Resolve "ghostButton" where no strategy can match (an error is expected)', async () => {
-      error = await engine.find(executor.page, spec, { perStrategyTimeout: 250, scrollRounds: 1 }).then(
-        () => null,
-        (err) => err
-      );
-    });
+    const { error, strategyUsed } = await fixturePage.resolveExpectingFailure(
+      'Resolve "unresolvableButton" where no strategy can match (an error is expected)',
+      spec
+    );
 
     await step('Check a LocatorResolutionError was thrown', async () => {
       expect(error, 'engine.find should have thrown').not.toBeNull();
@@ -237,56 +160,51 @@ test.describe('Locator strategy engine - deterministic checks', () => {
     });
 
     await step('Check the engine marked the locator as "unresolved"', async () => {
-      expect(engine.lastUsed.strategy).toBe('unresolved');
+      expect(strategyUsed).toBe('unresolved');
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Group 5 - strategy checker utility
-  // -------------------------------------------------------------------------
-  test('Strategy checker: validates every rank and the fallback order of whole locator lists', async ({ executor }) => {
+  // Strategy checker
+  test('Strategy checker: Validates every rank and the fallback order of whole locator lists', async ({
+    page,
+    executor,
+  }) => {
     const step = stepsFor(executor);
-    const specs = [
-      {
-        name: 'submit',
-        strategies: [
-          { type: 'testId', value: 'login-submit' },
-          { type: 'role', value: { role: 'button', name: 'Sign in', exact: true } },
-          { type: 'css', value: '#sign-in' },
-          { type: 'xpath', value: "//*[@id='sign-in']" },
-        ],
-      },
-      {
-        name: 'email',
-        strategies: [
-          { type: 'label', value: 'Email address' },
-          { type: 'placeholder', value: 'Your email' },
-          { type: 'testId', value: 'email-input' },
-          { type: 'css', value: '#email' },
-          { type: 'xpath', value: "//*[@id='email']" },
-        ],
-      },
-    ];
-    let outcome;
+    const fixturePage = new LocatorFixturePage(page, executor);
+    const locators = TARGETS.map((target) => target.locator);
 
     executor.logger.info(
       'PURPOSE: run the checker that guards real locator files. For each locator it proves that ' +
         '(1) every rank works alone, (2) every rank points at the same element, and ' +
         '(3) the engine falls back through the ranks in the configured order.'
     );
-    specs.forEach((s) => executor.logger.info(`Locator "${s.name}": ${s.strategies.map((x) => x.type).join(' > ')}`));
+    locators.forEach((name) =>
+      executor.logger.info(`Locator "${name}": ${fixturePage.spec(name).strategies.map((x) => x.type).join(' > ')}`)
+    );
 
-    await step('Run the strategy checker on the "submit" and "email" locators', async () => {
-      // The checker logs one result line per locator into this test's step timeline.
-      outcome = await checkLocatorStrategies(executor.page, specs, {
-        logger: executor.logger,
-        timeoutMs: 300,
-        label: 'fixture',
-      });
-    });
+    // The checker logs one result line per locator into this test's step timeline.
+    const outcome = await fixturePage.checkStrategies(`Run the strategy checker on ${locators.join(', ')}`, locators);
 
     await step('Check no rank failed to resolve, pointed at a different element, or broke fallback order', async () => {
       expect(outcome.failures, outcome.summary).toEqual([]);
+    });
+  });
+
+  test('Strategy checker: Flags a loose css selector that matches a decoy element', async ({ page, executor }) => {
+    const step = stepsFor(executor);
+    const fixturePage = new LocatorFixturePage(page, executor);
+
+    executor.logger.info(
+      'PURPOSE: rank 2 css ".btn" resolves, but to the SSO decoy button that comes first in the page. ' +
+        'The checker must report that it does not point at the same element as rank 1.'
+    );
+
+    const outcome = await fixturePage.checkStrategies('Run the strategy checker on "looseCssSignIn"', ['looseCssSignIn']);
+
+    await step('Check exactly one problem was reported: rank 2 css is not the same element as rank 1', async () => {
+      expect(outcome.failures, outcome.summary).toHaveLength(1);
+      expect(outcome.failures[0]).toContain('css(.btn)');
+      expect(outcome.failures[0]).toContain('not to the same element as rank 1');
     });
   });
 });

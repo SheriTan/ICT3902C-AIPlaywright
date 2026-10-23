@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Locator strategy fixture</title>
+    <style>
+      body { font-family: sans-serif; margin: 2rem; max-width: 28rem; }
+      .site-header, .newsletter, .login-card { margin-bottom: 1.5rem; }
+      .login-card { border: 1px solid #c9ced6; border-radius: 6px; padding: 1rem; }
+      .field { display: flex; flex-direction: column; margin-bottom: 0.75rem; }
+      .input { padding: 0.4rem; border: 1px solid #8a93a2; border-radius: 4px; }
+      .input-email { border-color: #2f5bea; }
+      .input-password { border-color: #8a2fea; }
+      .input-newsletter { border-color: #999; }
+      .btn { padding: 0.5rem 1rem; border: 1px solid #888; border-radius: 4px; cursor: pointer; }
+      .btn-primary { background: #2f5bea; color: #fff; }
+      .btn-secondary { background: #eee; color: #222; }
+      .status-banner { padding: 0.4rem 0.6rem; border-radius: 4px; }
+      .status-banner[data-state='info'] { background: #eef1f5; color: #555; }
+      .status-banner[data-state='ready'] { background: #e6f6ed; color: #1a7f37; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <button type="button" class="btn btn-secondary sso-submit" data-testid="sso-submit">Sign in with SSO</button>
+    </header>
+
+    <section class="newsletter">
+      <label for="newsletter-email">Newsletter email</label>
+      <input
+        id="newsletter-email"
+        type="email"
+        class="input input-newsletter"
+        data-testid="newsletter-input"
+        placeholder="Newsletter email"
+      />
+    </section>
+
+    <form class="login-card" novalidate>
+      <div class="field field--email">
+        <label for="email">Email address</label>
+        <input id="email" type="email" class="input input-email" data-testid="email-input" placeholder="Your email" />
+      </div>
+      <div class="field field--password">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          class="input input-password"
+          data-testid="password-input"
+          placeholder="Your password"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary login-submit" data-testid="login-submit">Sign in</button>
+    </form>
+
+    <p class="status-banner" data-state="info">Tip: use your work email</p>
+    <p class="status-banner" data-state="ready">Ready to sign in</p>
+  </body>
+</html>

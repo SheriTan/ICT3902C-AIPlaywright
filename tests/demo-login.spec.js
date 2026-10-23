@@ -43,22 +43,19 @@ test.describe('Practice Software Testing - Login', () => {
   test('Login fails with an incorrect password', async ({ page, executor }) => {
     const loginPage = await openLogin(page, executor);
     await loginPage.login('Invalid password', 'customer2@practicesoftwaretesting.com', 'DefinitelyWrong123!');
-    //await expectLoginFailure(page);
-    await expect(page).not.toHaveURL(LOGIN_URL);
+    await expectLoginFailure(page);
   });
 
   test('Login fails with an unregistered email address', async ({ page, executor }) => {
     const loginPage = await openLogin(page, executor);
     await loginPage.login('Unknown account', 'not-a-real-user-2026@example.com', 'welcome01');
-    //await expectLoginFailure(page);
-    await expect(page).not.toHaveURL(LOGIN_URL);
+    await expectLoginFailure(page);
   });
 
   test('Login fails when both fields are incorrect', async ({ page, executor }) => {
     const loginPage = await openLogin(page, executor);
     await loginPage.login('Invalid credentials', 'nobody-2026@example.com', 'wrong-password');
-    //await expectLoginFailure(page);
-    await expect(page).not.toHaveURL(LOGIN_URL);
+    await expectLoginFailure(page);
   });
 
   test('Login form rejects an empty submission', async ({ page, executor }) => {

@@ -1,0 +1,58 @@
+{
+  "emailInput": {
+    "strategies": [
+      { "type": "label", "value": "Email address" },
+      { "type": "placeholder", "value": "Your email" },
+      { "type": "testId", "value": "email-input" },
+      { "type": "css", "value": "form.login-card .field--email > input.input-email" },
+      { "type": "xpath", "value": "//div[contains(@class,'field--email')]/input" }
+    ]
+  },
+  "passwordInput": {
+    "strategies": [
+      { "type": "label", "value": "Password" },
+      { "type": "placeholder", "value": "Your password" },
+      { "type": "testId", "value": "password-input" },
+      { "type": "css", "value": "form.login-card .field--password > input.input-password" },
+      { "type": "xpath", "value": "//div[contains(@class,'field--password')]/input" }
+    ]
+  },
+  "signInButton": {
+    "strategies": [
+      { "type": "testId", "value": "login-submit" },
+      { "type": "role", "value": { "role": "button", "name": "Sign in", "exact": true } },
+      { "type": "css", "value": "form.login-card button.btn-primary.login-submit" },
+      { "type": "xpath", "value": "//form[contains(@class,'login-card')]//button[normalize-space()='Sign in']" }
+    ]
+  },
+  "statusMessage": {
+    "strategies": [
+      { "type": "text", "value": "Ready to sign in" },
+      { "type": "css", "value": "p.status-banner[data-state='ready']" },
+      { "type": "xpath", "value": "//p[@data-state='ready']" }
+    ]
+  },
+
+  "brokenRank1SignIn": {
+    "_purpose": "Test-only: rank 1 points at a test id that does not exist, so the engine must fall back to rank 2.",
+    "strategies": [
+      { "type": "testId", "value": "missing-test-id" },
+      { "type": "role", "value": { "role": "button", "name": "Sign in", "exact": true } },
+      { "type": "css", "value": "form.login-card button.btn-primary.login-submit" }
+    ]
+  },
+  "unresolvableButton": {
+    "_purpose": "Test-only: nothing on the page matches, so the engine must fail and list every attempt.",
+    "strategies": [
+      { "type": "testId", "value": "no-such-test-id" },
+      { "type": "css", "value": "button.no-such-class" }
+    ]
+  },
+  "looseCssSignIn": {
+    "_purpose": "Test-only: rank 2 css is too loose. `.btn` also matches the SSO decoy, which comes first in the page.",
+    "strategies": [
+      { "type": "testId", "value": "login-submit" },
+      { "type": "css", "value": ".btn" }
+    ]
+  }
+}

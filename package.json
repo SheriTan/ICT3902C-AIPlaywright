@@ -13,9 +13,7 @@
     "report": "node core/reporting/generateReport.js --open",
     "report:html": "playwright show-report reports/html-report",
     "analyze": "node core/reporting/analyzeFailures.js",
-    "diagnose": "npm run analyze && npm run report",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "diagnose": "npm run analyze && npm run report"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +23,6 @@
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
     "cross-env": "^10.1.0",
-    "dotenv": "^17.4.2",
-    "prettier": "^3.9.10"
+    "dotenv": "^17.4.2"
   }
 }

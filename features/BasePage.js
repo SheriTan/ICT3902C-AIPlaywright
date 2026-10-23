@@ -21,12 +21,21 @@ class BasePage {
   }
 
   /**
+   * The ranked strategies of one locator in this page's locator file, without resolving them.
+   * @param {string} locatorName - key inside the locator file
+   * @param {{ dynamicValue?: string }} [substitutions] - fills "__DYNAMIC__" strategy values
+   */
+  spec(locatorName, substitutions) {
+    return loadLocatorSpec(this.pageName, locatorName, substitutions);
+  }
+
+  /**
    * Finds an element using the ranked strategies in this page's locator file.
    * @param {string} locatorName - key inside the locator file
    * @param {{ dynamicValue?: string }} [substitutions] - fills "__DYNAMIC__" strategy values
    */
   locate(locatorName, substitutions) {
-    return this.executor.locate(loadLocatorSpec(this.pageName, locatorName, substitutions));
+    return this.executor.locate(this.spec(locatorName, substitutions));
   }
 
   /** Navigates to `url` (relative to baseURL) as a step and waits for the network to settle. */

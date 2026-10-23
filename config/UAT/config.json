@@ -1,0 +1,6 @@
+{
+  "env": "UAT",
+  "baseURL": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+  "timeout": 10000,
+  "retries": 0
+}

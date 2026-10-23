@@ -11,6 +11,7 @@ module.exports = {
   PROJECT_ROOT,
   CONFIG_DIR: path.join(PROJECT_ROOT, 'config'),
   LOCATORS_DIR: path.join(PROJECT_ROOT, 'locators'),
+  DATA_DIR: path.join(PROJECT_ROOT, 'data'),
   SENSITIVE_DIR: path.join(PROJECT_ROOT, 'data', 'sensitive'),
   LOGS_DIR,
   AI_DIAGNOSIS_DIR: path.join(LOGS_DIR, 'ai-diagnosis'),
@@ -21,3 +22,4 @@ module.exports = {
   HTML_REPORT_DIR: path.join(REPORTS_DIR, 'html-report'),
   AI_REPORT_DIR: path.join(REPORTS_DIR, 'ai-report'),
 };
+
