@@ -12,7 +12,7 @@ class LoginPage extends BasePage {
   }
 
   /**
-   * @param {string} name - label for the step title (e.g. "Jack Howe"); never the credentials themselves
+   * @param {string} name
    * @param {string} username
    * @param {string} password
    */

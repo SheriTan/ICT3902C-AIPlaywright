@@ -29,8 +29,8 @@ if (envFlag('HTML_REPORT')) {
  */
 module.exports = defineConfig({
   testDir: './tests',
-  timeout: envConfig.timeout, // max test execution duration
-  retries: envConfig.retries, // max retries on failed test execution
+  timeout: envConfig.waitTimeout, // max test execution duration
+  retries: envConfig.recoveryRetries, // max retries on failed test execution
 
   // Defaults from Playwright framework
   /* Run tests in files in parallel */

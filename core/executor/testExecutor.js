@@ -1,11 +1,18 @@
 // Runs a test's actions as named, retryable steps and records what happened
 // (step timeline, locator used, where and why it failed) for the log reporter and the AI diagnosis.
+// Owns the three engines a test can use: locatorEngine (find), recoveryEngine (retry), waitEngine (wait).
 
 const { Logger } = require('../logger/logger');
 const { redact } = require('../logger/sensitiveData');
 const { LocatorEngine } = require('../locator-engine/locatorEngine');
-const { RecoveryEngine } = require('../recovery/recoveryEngine');
+const { RecoveryEngine } = require('../recovery-engine/recoveryEngine');
+const { WaitEngine } = require('../wait-engine/waitEngine');
+const { loadConfig } = require('../../utils/global/configLoader');
 const { firstLine } = require('../../utils/global/text');
+
+// Used when config/<ENV>/config.json does not set recoveryRetries / waitTimeout
+const DEFAULT_RECOVERY_RETRIES = 2;
+const DEFAULT_WAIT_TIMEOUT = 15000;
 
 class TestExecutor {
   /**
@@ -16,7 +23,15 @@ class TestExecutor {
     this.page = page;
     this.testInfo = testInfo;
     this.logger = new Logger(testInfo);
-    this.recoveryEngine = new RecoveryEngine(page, this.logger);
+
+    const config = loadConfig();
+    this.waitEngine = new WaitEngine(page, this.logger, {
+      defaultTimeout: config.waitTimeout ?? DEFAULT_WAIT_TIMEOUT,
+    });
+    this.recoveryEngine = new RecoveryEngine(page, this.logger, {
+      defaultRetries: config.recoveryRetries ?? DEFAULT_RECOVERY_RETRIES,
+      waitEngine: this.waitEngine,
+    });
     this.locatorEngine = new LocatorEngine(this.logger, this.recoveryEngine);
 
     this.currentStep = null;
@@ -41,18 +56,14 @@ class TestExecutor {
     return this.locatorEngine.find(this.page, spec, { scrollRounds: defaultScrollRounds, ...options });
   }
 
-  /** Waits until the page stops re-rendering (Playwright's auto-wait only covers single elements). */
-  waitForStableDOM(options) {
-    return this.recoveryEngine.waitForStableDOM(options);
-  }
-
   /**
    * @param {string} name - human-readable step name, shown in logs/reports
    * @param {() => Promise<any>} fn - the actual Playwright actions
-   * @param {{ retries?: number }} [options] - defaults to 2 retries, or 0 on the final attempt
+   * @param {{ retries?: number }} [options] - defaults to recoveryRetries from config/<ENV>/config.json;
+   *   use { retries: 0 } for deterministic checks that must fail at the step that caused them
    */
   async step(name, fn, options = {}) {
-    const { retries = this.isFinalAttempt ? 0 : 2 } = options;
+    const { retries = this.recoveryEngine.defaultRetries } = options;
 
     return this.testInfo.step
       ? this.testInfo.step(name, () => this._runStep(name, fn, retries))

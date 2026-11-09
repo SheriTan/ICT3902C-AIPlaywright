@@ -1,0 +1,65 @@
+{
+  "countrySelect": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "country-select"
+      },
+      {
+        "type": "label",
+        "value": "Country"
+      }
+    ]
+  },
+  "stateSelect": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "state-select"
+      },
+      {
+        "type": "label",
+        "value": "State / Province"
+      }
+    ]
+  },
+  "citySelect": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "city-select"
+      },
+      {
+        "type": "label",
+        "value": "City"
+      }
+    ]
+  },
+  "saveButton": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "save-address"
+      },
+      {
+        "type": "role",
+        "value": {
+          "role": "button",
+          "name": "Save address"
+        }
+      }
+    ]
+  },
+  "addressSummary": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "address-summary"
+      },
+      {
+        "type": "css",
+        "value": ".summary"
+      }
+    ]
+  }
+}

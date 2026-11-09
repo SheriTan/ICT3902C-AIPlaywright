@@ -8,7 +8,7 @@ const { CONFIG_DIR } = require('./paths');
 const cache = new Map();
 
 /**
- * @returns {{ env: string, baseURL: string, timeout: number, retries: number, credentials: object }}
+ * @returns {{ env: string, baseURL: string, waitTimeout: number, recoveryRetries: number, credentials: object }}
  */
 function loadConfig() {
   const env = (process.env.ENV || 'DEMO').toUpperCase();

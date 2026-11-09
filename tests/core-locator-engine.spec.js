@@ -1,6 +1,6 @@
 const { test, expect } = require('../core/fixtures');
 const { describeStrategy } = require('../core/locator-engine/locatorEngine');
-const { LocatorFixturePage } = require('../features/LocatorFixturePage');
+const { LocatorFixturePage } = require('../features/LocatorFixture/LocatorFixturePage');
 
 // Tests the locator engine and strategy checker against a local HTML page (data/locator-fixture.html)
 // through the LocatorFixturePage page object. Locators are in locators/locatorFixturePage.locators.json.

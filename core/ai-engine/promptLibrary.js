@@ -1,10 +1,4 @@
 // Prompt Library for the AI Intelligence Layer
-//
-// Runs the same failure log through several prompting strategies and
-// compare the outputs side-by-side (see core/reporting/analyzeFailures.js --compare)
-//
-// Every variant is required to end its instructions by demanding a single
-// fenced ```json block so DiagnosisEngine can parse the result the same way.
 
 const RESPONSE_SCHEMA = `{
   "category": "one of: LocatorFragility | Timing/Flakiness | EnvironmentOrNetwork | ApplicationBug | TestScriptDefect | Unknown",
@@ -32,16 +26,11 @@ function describeFailure(ctx) {
 }
 
 const PROMPT_VARIANTS = {
-  /**
-   * Fast + cheap. Minimises tokens so it is safe to run on every CI
-   * failure without burning through a free-tier rate limit. Good default
-   * for "always-on" diagnosis shown in the AI report.
-   */
   concise: {
     label: 'Concise Direct-Answer',
     description:
       'Single short instruction, no reasoning shown. Optimised for low token usage / fast turnaround so it can run on every failed test.',
-    build: (ctx) => `You are a senior QA automation engineer reviewing a Playwright test failure.
+    build: (ctx) => `You are a QA automation engineer reviewing a Playwright test failure.
 Analyse the failure below and respond with ONLY the JSON object described, no other text.
 
 ${describeFailure(ctx)}
@@ -52,17 +41,11 @@ ${RESPONSE_SCHEMA}
 \`\`\``,
   },
 
-  /**
-   * Slower + more tokens, but asks the model to reason through the
-   * timeline before concluding. Useful when the concise variant produces
-   * a vague or low-confidence answer, or for the handful of failures you
-   * want to write up in detail for the report.
-   */
   chain_of_thought: {
     label: 'Chain-of-Thought Root Cause',
     description:
       'Asks the model to reason step-by-step through the attempt timeline before committing to a conclusion. Slower/more tokens, generally higher-quality reasoning on ambiguous failures.',
-    build: (ctx) => `You are a senior QA automation engineer performing root-cause analysis on a Playwright
+    build: (ctx) => `You are a QA automation engineer performing root-cause analysis on a Playwright
 test failure. Think through the evidence step by step:
 1. What was the test trying to do at the failed step?
 2. What do the locator strategy attempts and their timeouts suggest?
@@ -80,11 +63,6 @@ Failure evidence:
 ${describeFailure(ctx)}`,
   },
 
-  /**
-   * Strict structured-output variant. No reasoning at all, no prose,
-   * temperature should be kept low by the caller. Useful for batch/
-   * programmatic comparison since it is the cheapest to parse reliably.
-   */
   structured_json: {
     label: 'Strict Structured JSON',
     description:

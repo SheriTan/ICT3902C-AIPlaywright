@@ -21,10 +21,23 @@ function describeStrategy(strategy) {
   return `${strategy.type}(${value})`;
 }
 
+/**
+ * One Playwright locator per strategy of a spec, WITHOUT waiting for any of them. For "is it gone?" checks
+ * (spinners, overlays), where waiting for the element to appear would defeat the purpose.
+ * @param {import('@playwright/test').Page} page
+ * @param {{ strategies: Array<{ type: string, value: any }> }} spec
+ * @returns {import('@playwright/test').Locator[]}
+ */
+function buildLocators(page, spec) {
+  return spec.strategies
+    .filter((strategy) => STRATEGY_BUILDERS[strategy.type])
+    .map((strategy) => STRATEGY_BUILDERS[strategy.type](page, strategy.value).first());
+}
+
 class LocatorEngine {
   /**
    * @param {{ info: (message: string) => void }} logger
-   * @param {import('../recovery/recoveryEngine').RecoveryEngine | null} [recoveryEngine]
+   * @param {import('../recovery-engine/recoveryEngine').RecoveryEngine | null} [recoveryEngine]
    *   when given, recovery actions run between scroll rounds
    */
   constructor(logger, recoveryEngine = null) {
@@ -91,4 +104,4 @@ class LocatorEngine {
   }
 }
 
-module.exports = { LocatorEngine, describeStrategy };
+module.exports = { LocatorEngine, describeStrategy, buildLocators };

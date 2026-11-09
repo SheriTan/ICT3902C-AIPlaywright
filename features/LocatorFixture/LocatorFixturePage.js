@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const { BasePage } = require('./BasePage');
-const { LocatorEngine } = require('../core/locator-engine/locatorEngine');
-const { checkLocatorStrategies } = require('../core/locator-engine/strategyChecker');
-const { loadLocatorSpec } = require('../utils/global/locatorLoader');
-const { DATA_DIR } = require('../utils/global/paths');
+const { BasePage } = require('../BasePage');
+const { LocatorEngine } = require('../../core/locator-engine/locatorEngine');
+const { checkLocatorStrategies } = require('../../core/locator-engine/strategyChecker');
+const { loadLocatorSpec } = require('../../utils/global/locatorLoader');
+const { DATA_DIR } = require('../../utils/global/paths');
 
 const PAGE_NAME = 'locatorFixturePage';
 const FIXTURE_PATH = path.join(DATA_DIR, 'locator-fixture.html');

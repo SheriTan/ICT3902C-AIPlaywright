@@ -1,7 +1,7 @@
 {
   "env": "DEMO",
   "baseURL": "https://practicesoftwaretesting.com/",
-  "timeout": 10000,
-  "retries": 1,
+  "recoveryRetries": 2,
+  "waitTimeout": 8000,
   "credentialsFile": "../../data/sensitive/DEMO/creds.json"
 }

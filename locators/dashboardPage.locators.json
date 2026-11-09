@@ -1,0 +1,43 @@
+{
+  "dashboardTitle": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "dashboard-title"
+      },
+      {
+        "type": "role",
+        "value": {
+          "role": "heading",
+          "name": "Sales dashboard"
+        }
+      }
+    ]
+  },
+  "salesChart": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "sales-chart"
+      },
+      {
+        "type": "css",
+        "value": ".chart"
+      }
+    ]
+  },
+  "loadingSpinner": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "loading-spinner"
+      },
+      {
+        "type": "role",
+        "value": {
+          "role": "status"
+        }
+      }
+    ]
+  }
+}

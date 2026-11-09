@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wait fixture - dashboard</title>
+    <style>
+      body { font-family: sans-serif; margin: 2rem; max-width: 36rem; }
+      .loading-spinner { padding: 0.5rem; background: #fff6d6; border-radius: 4px; margin-bottom: 1rem; }
+      .widgets { display: flex; gap: 1rem; margin-bottom: 1rem; }
+      .widget { flex: 1; border: 1px solid #c9ced6; border-radius: 6px; padding: 0.75rem; }
+      .widget h2 { margin: 0 0 0.5rem; font-size: 0.9rem; color: #555; }
+      .value { margin: 0; font-size: 1.4rem; }
+      .chart { height: 5rem; background: #e6f6ed; border-radius: 6px; padding: 0.5rem; margin-bottom: 1rem; }
+      .banner { padding: 0.5rem; background: #eef1f5; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <h1 data-testid="dashboard-title">Sales dashboard</h1>
+    <div class="loading-spinner" data-testid="loading-spinner" role="status">Loading dashboard...</div>
+
+    <section class="widgets">
+      <div class="widget"><h2>Revenue</h2><p class="value" data-testid="widget-revenue">-</p></div>
+      <div class="widget"><h2>Orders</h2><p class="value" data-testid="widget-orders">-</p></div>
+      <div class="widget"><h2>Users</h2><p class="value" data-testid="widget-users">-</p></div>
+    </section>
+
+    <div id="chart-slot"></div>
+    <div id="banner-slot"></div>
+
+    <script>
+      // ?broken=spinner keeps the loading spinner on screen forever (used to test the failure message)
+      const broken = new URLSearchParams(location.search).get('broken');
+
+      const loadWidget = async (name) => {
+        const response = await fetch(`/api/dashboard/${name}`);
+        const data = await response.json();
+        const element = document.querySelector(`[data-testid="widget-${name}"]`);
+        element.textContent = data.value;
+        element.dataset.loaded = 'true';
+      };
+
+      Promise.all(['revenue', 'orders', 'users'].map(loadWidget)).then(() => {
+        // The chart is drawn after ALL widget data arrived, the spinner goes after the chart,
+        // and a welcome banner is injected a moment later - three separate DOM updates.
+        setTimeout(() => {
+          document.getElementById('chart-slot').innerHTML =
+            '<div class="chart" data-testid="sales-chart">Sales chart (3 series)</div>';
+          if (broken !== 'spinner') document.querySelector('[data-testid="loading-spinner"]').remove();
+          setTimeout(() => {
+            document.getElementById('banner-slot').innerHTML =
+              '<div class="banner" data-testid="welcome-banner">Welcome back</div>';
+          }, 200);
+        }, 300);
+      });
+    </script>
+  </body>
+</html>

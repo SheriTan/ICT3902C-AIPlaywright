@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wait fixture - shipping address</title>
+    <style>
+      body { font-family: sans-serif; margin: 2rem; max-width: 28rem; }
+      .field { display: flex; flex-direction: column; margin-bottom: 0.75rem; }
+      select, button { padding: 0.4rem; }
+      .summary { margin-top: 1rem; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>Shipping address</h1>
+    <form novalidate>
+      <div class="field">
+        <label for="country">Country</label>
+        <select id="country" data-testid="country-select">
+          <option value="">Select a country</option>
+          <option value="US">United States</option>
+          <option value="CA">Canada</option>
+          <option value="MY">Malaysia</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="state">State / Province</label>
+        <select id="state" data-testid="state-select" disabled>
+          <option value="">Select a country first</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="city">City</label>
+        <select id="city" data-testid="city-select" disabled>
+          <option value="">Select a state first</option>
+        </select>
+      </div>
+      <button type="button" data-testid="save-address">Save address</button>
+      <p class="summary" data-testid="address-summary"></p>
+    </form>
+
+    <script>
+      // ?broken=states makes the states request fail, so the state dropdown never finishes loading.
+      const broken = new URLSearchParams(location.search).get('broken');
+      const country = document.getElementById('country');
+      const state = document.getElementById('state');
+      const city = document.getElementById('city');
+
+      const setOptions = (select, items, placeholder) => {
+        select.innerHTML = '';
+        select.add(new Option(placeholder, ''));
+        items.forEach((item) => select.add(new Option(item.name, item.id)));
+        select.disabled = false;
+      };
+      const setBusy = (select) => {
+        select.innerHTML = '';
+        select.add(new Option('Loading...', ''));
+        select.disabled = true;
+      };
+      const reset = (select, placeholder) => {
+        select.innerHTML = '';
+        select.add(new Option(placeholder, ''));
+        select.disabled = true;
+      };
+      const get = async (url) => (await fetch(url)).json();
+
+      country.addEventListener('change', async () => {
+        reset(city, 'Select a state first');
+        if (!country.value) return reset(state, 'Select a country first');
+
+        // First load shows "Loading...". When the country CHANGES, the old states stay on screen (enabled)
+        // until the new list arrives, like many real apps do. A test that does not wait for the new list
+        // would pick a state that belongs to the previous country.
+        if (state.options.length <= 1) setBusy(state);
+        const states = await get(`/api/countries/${country.value}/states${broken ? `?broken=${broken}` : ''}`);
+        setOptions(state, states, 'Select a state');
+      });
+
+      state.addEventListener('change', async () => {
+        if (!state.value) return reset(city, 'Select a state first');
+        setBusy(city);
+        const cities = await get(`/api/states/${state.value}/cities`);
+        setOptions(city, cities, 'Select a city');
+      });
+
+      document.querySelector('[data-testid="save-address"]').addEventListener('click', () => {
+        const label = (select) => select.selectedOptions[0].text;
+        document.querySelector('[data-testid="address-summary"]').textContent =
+          `${label(country)} / ${label(state)} / ${label(city)}`;
+      });
+    </script>
+  </body>
+</html>

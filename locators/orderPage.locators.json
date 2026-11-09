@@ -1,0 +1,45 @@
+{
+  "placeOrderButton": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "place-order"
+      },
+      {
+        "type": "role",
+        "value": {
+          "role": "button",
+          "name": "Place order"
+        }
+      }
+    ]
+  },
+  "orderId": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "order-id"
+      }
+    ]
+  },
+  "orderStatus": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "order-status"
+      },
+      {
+        "type": "css",
+        "value": ".status"
+      }
+    ]
+  },
+  "trackingNumber": {
+    "strategies": [
+      {
+        "type": "testId",
+        "value": "tracking-number"
+      }
+    ]
+  }
+}

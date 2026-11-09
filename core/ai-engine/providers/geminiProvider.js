@@ -24,7 +24,6 @@ async function generate(prompt, options = {}) {
   try {
     response = await fetch(url, {
       method: 'POST',
-      // The key goes in a header (not the URL) so it cannot leak into logs or error messages
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],

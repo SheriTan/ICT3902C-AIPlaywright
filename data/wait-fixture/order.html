@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wait fixture - order</title>
+    <style>
+      body { font-family: sans-serif; margin: 2rem; max-width: 28rem; }
+      button { padding: 0.5rem 1rem; }
+      .status { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>Checkout</h1>
+    <button type="button" data-testid="place-order">Place order</button>
+
+    <section id="order" hidden>
+      <p data-testid="order-confirmation">Order <span data-testid="order-id"></span> received</p>
+      <p>Status: <span class="status" data-testid="order-status">PENDING</span></p>
+      <p data-testid="tracking-number" hidden></p>
+    </section>
+
+    <script>
+      // ?scenario=success (default) | decline (payment fails) | stall (order gets stuck at PACKED)
+      const scenario = new URLSearchParams(location.search).get('scenario') || 'success';
+      const byId = (id) => document.querySelector(`[data-testid="${id}"]`);
+
+      document.querySelector('[data-testid="place-order"]').addEventListener('click', async () => {
+        const response = await fetch('/api/orders', { method: 'POST', body: JSON.stringify({ scenario }) });
+        const order = await response.json();
+        byId('order-id').textContent = order.id;
+        document.getElementById('order').hidden = false;
+
+        // The back office moves the order through its stages; the page only reflects what it polls.
+        const poll = setInterval(async () => {
+          const latest = await (await fetch(`/api/orders/${order.id}`)).json();
+          byId('order-status').textContent = latest.status;
+          if (latest.trackingNumber) {
+            byId('tracking-number').textContent = `Tracking: ${latest.trackingNumber}`;
+            byId('tracking-number').hidden = false;
+          }
+          if (latest.status === 'SHIPPED' || latest.status === 'PAYMENT_FAILED') clearInterval(poll);
+        }, 300);
+      });
+    </script>
+  </body>
+</html>
